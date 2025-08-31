@@ -1,3 +1,18 @@
+import {drawScene, 
+    loadAssets
+} from './renderer.js';
+
+import {
+    startDialogue,
+    updateInventoryView,
+    updateDialogueText,
+    setupCharacterSwitcher
+} from './ui.js';
+
+import { gameData } from './data.js';
+const gameOptions = {
+    opTextTimeOut: 3000 // Tiempo que tarda en desaparecer solo el ultimo dialogo en milisegundos.
+};
 
 //////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -23,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     console.log(`game.js: Found ${allImagePaths.length} images to preload.`);
-    preloadImages(allImagePaths, () => {
+    loadAssets(allImagePaths, () => {
         console.log('game.js: All images preloaded. Initializing game.');
         const canvas = document.getElementById('game-canvas');
         const ctx = canvas.getContext('2d');
@@ -36,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ///    GAME INIT STATE
         ///
         //////////////////////////////////////////////////////////////////////////////////////
+
 
         const initialInventories = {};
         Object.keys(characters).forEach(charKey => {

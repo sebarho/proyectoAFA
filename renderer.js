@@ -34,7 +34,7 @@ function loadImage(src, callback) {
     img.src = src;
 }
 
-function preloadImages(imagePaths, callback) {
+export function loadAssets(imagePaths, callback) {
     /// Detecta la cantidad de imagenes en el Path indicado y llama a cargarlas
     imagesToLoad = imagePaths.length;
     imagesLoaded = 0;
@@ -48,7 +48,7 @@ function preloadImages(imagePaths, callback) {
     imagePaths.forEach(path => loadImage(path, () => {}));
 }
 
-function drawScene(dependencies) {
+export function drawScene(dependencies) {
     ///
     console.log('renderer.js: drawScene called.');
     const { ctx, scenes, characters, gameState } = dependencies;

@@ -1,10 +1,8 @@
-/// <reference path="./api.js" />
+/// DIrectiva para que el editor detecte las funciones de api.js
+/// <reference path="./game.js" /> 
 
-const gameOptions = {
-        opTextTimeOut: 3000 // Tiempo que tarda en desaparecer solo el ultimo dialogo en milisegundos.
-};
 
-const gameData = {
+export const gameData = {
     characters: {
         'Pancho': {
             name: 'Pancho', alias: 'Pancho', description: "Pancho: El Anfitrión.",

@@ -1,6 +1,6 @@
 // --- 5. SISTEMAS DE UI ---
 
-function startDialogue(speakerName, listenerName, dependencies) {
+export function startDialogue(speakerName, listenerName, dependencies) {
     const { dialogueMatrix, gameState, verbBar, dialogueOptionsContainer, dialogueText } = dependencies;
     
     let conversation = dialogueMatrix[listenerName] || dialogueMatrix.default;
@@ -50,7 +50,7 @@ function updateDialogueView(dependencies) {
     }
 }
 
-function selectDialogueOption(option, dependencies) {
+export function selectDialogueOption(option, dependencies) {
     const { gameState, dialogueText, dialogueOptionsContainer, characters } = dependencies;
     const { listener, speaker } = gameState.dialogue;
     const dialogueLong = 0;
@@ -96,7 +96,7 @@ function selectDialogueOption(option, dependencies) {
     }
 }
 
-function endDialogue(dependencies) {
+export function endDialogue(dependencies) {
     const { gameState, verbBar, dialogueOptionsContainer, dialogueText } = dependencies;
     if (verbBar) verbBar.style.display = 'grid';
     if (dialogueOptionsContainer) {
@@ -118,7 +118,7 @@ function getItemData(itemName, gameData) {
     return null;
 }
 
-function updateInventoryView(dependencies) {
+export function updateInventoryView(dependencies) {
     const { inventoryBox, gameState, gameData, characters } = dependencies;
     inventoryBox.innerHTML = `<h3>Inventario (${characters[gameState.currentPlayer].alias})</h3>`;
     const list = document.createElement('ul');
@@ -149,7 +149,7 @@ function updateInventoryView(dependencies) {
     inventoryBox.appendChild(list);
 }
 
-function updateDialogueText(dependencies) {
+export function updateDialogueText(dependencies) {
     const { dialogueText, gameState, scenes, characters, gameData } = dependencies;
     if (gameState.dialogue && gameState.dialogue.active) return;
 
@@ -215,7 +215,7 @@ function updateDialogueText(dependencies) {
     }
 }
 
-function setupCharacterSwitcher(dependencies) {
+export function setupCharacterSwitcher(dependencies) {
     const { characterSwitcher, characters, gameState, fullRedraw } = dependencies;
     characterSwitcher.innerHTML = '<h3>Amigos:</h3>';
     
