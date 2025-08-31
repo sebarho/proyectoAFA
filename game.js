@@ -10,9 +10,7 @@ import {
 } from './ui.js';
 
 import { gameData } from './data.js';
-const gameOptions = {
-    opTextTimeOut: 3000 // Tiempo que tarda en desaparecer solo el ultimo dialogo en milisegundos.
-};
+
 
 //////////////////////////////////////////////////////////////////////////////////////
 ///

@@ -1,4 +1,7 @@
 // --- 5. SISTEMAS DE UI ---
+export const uiOptions = {
+    dialogueSpeed: 1
+};
 
 export function startDialogue(speakerName, listenerName, dependencies) {
     const { dialogueMatrix, gameState, verbBar, dialogueOptionsContainer, dialogueText } = dependencies;
@@ -106,16 +109,9 @@ export function endDialogue(dependencies) {
     if (gameState) {
         gameState.dialogue = null;
     }
-    setTimeout(() => { if(dialogueText) dialogueText.textContent = '' }, gameOptions.opTextTimeOut);
-}
-
-function getItemData(itemName, gameData) {
-    for (const scene of Object.values(gameData.scenes)) {
-        if (scene.items[itemName]) {
-            return scene.items[itemName];
-        }
-    }
-    return null;
+    const textLen = dialogueText.textContent.length;
+    const textSpeed = textLen * uiOptions.dialogueSpeed;
+    setTimeout(() => { if(dialogueText) dialogueText.textContent = '' }, textSpeed);
 }
 
 export function updateInventoryView(dependencies) {
@@ -216,7 +212,7 @@ export function updateDialogueText(dependencies) {
 }
 
 export function setupCharacterSwitcher(dependencies) {
-    const { characterSwitcher, characters, gameState, fullRedraw } = dependencies;
+    const { characterSwitcher, characters, gameState, scenes, fullRedraw } = dependencies;
     characterSwitcher.innerHTML = '<h3>Amigos:</h3>';
     
     Object.entries(characters).forEach(([key, char]) => {
@@ -231,6 +227,13 @@ export function setupCharacterSwitcher(dependencies) {
             gameState.activeItem = null; // Deselect item on character switch
             document.querySelectorAll('.character-avatar').forEach(a => a.classList.remove('active'));
             avatar.classList.add('active');
+            // Buscar la escena donde está el personaje
+            for (const [sceneKey, scene] of Object.entries(scenes)) {
+                if (scene.characters.includes(key)) {
+                    gameState.currentScene = sceneKey;
+                    break;
+                }
+            }
             updateInventoryView(dependencies);
             fullRedraw(); 
         });
@@ -240,8 +243,8 @@ export function setupCharacterSwitcher(dependencies) {
     });
 }
 
-// Helper function to find an item's data across all scenes
 function getItemData(itemName, gameData) {
+    /// Helper function to find an item's data across all scenes
     for (const scene of Object.values(gameData.scenes)) {
         if (scene.items[itemName]) {
             return scene.items[itemName];
@@ -250,4 +253,5 @@ function getItemData(itemName, gameData) {
     // If not found in any scene, it might be a dynamically added item or an error
     // We can return a default object or null
     return { name: itemName.replace(/_/g, ' ') };
+    // return null
 }
