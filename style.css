@@ -1,0 +1,130 @@
+body {
+    background-color: #000;
+    color: #FFF;
+    font-family: 'Press Start 2P', cursive;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-size: 12px;
+}
+
+#game-container {
+    width: 800px;
+    height: 600px;
+    border: 4px solid #555;
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+#scene-container {
+    width: 100%;
+    height: 65%;
+    background-color: #000;
+    border-bottom: 4px solid #555;
+}
+
+#game-canvas { width: 100%; height: 100%; }
+
+#ui-container {
+    width: 100%;
+    height: 35%;
+    display: flex;
+    background-color: #222;
+}
+
+#main-ui-area {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+}
+
+#dialogue-box {
+    height: 60%;
+    padding: 10px;
+    box-sizing: border-box;
+    border-bottom: 4px solid #555;
+    color: #00FFFF; /* Cyan */
+    text-align: center;
+    font-size: 12px;
+    overflow-y: auto; /* Add scroll for overflow */
+    line-height: 1.4;
+}
+
+#verb-bar {
+    height: 60%;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+#dialogue-options-container {
+    height: 60%;
+    padding: 10px;
+    display: none; /* Oculto por defecto */
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dialogue-option {
+    color: #00FFFF;
+    cursor: pointer;
+    padding: 4px;
+    border: 1px solid transparent;
+}
+.dialogue-option:hover { border: 1px solid #FFFF00; color: #FFFF00; }
+
+.verb-button {
+    background-color: #555;
+    color: #FFF;
+    border: 2px solid #AAA;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: center;
+}
+.verb-button:hover { background-color: #777; color: #FFFF00; }
+
+#right-panel {
+    width: 30%;
+    border-left: 4px solid #555;
+    display: flex;
+    flex-direction: column;
+}
+
+#character-switcher {
+    height: 50%;
+    padding: 5px;
+    text-align: center;
+    overflow-y: auto;
+}
+
+#inventory-box {
+    height: 50%;
+    border-top: 4px solid #555;
+    padding: 5px;
+    text-align: center;
+    overflow-y: auto;
+}
+
+#right-panel h3 { margin: 0 0 10px 0; font-size: 1em; color: #FF00FF; }
+
+.character-avatar, .inventory-item {
+    padding: 5px;
+    margin: 2px 0;
+    background-color: #444;
+    border: 1px solid #888;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.character-avatar:hover, .inventory-item:hover { background-color: #666; }
+
+.character-avatar.active, .inventory-item.active {
+    background-color: #D2691E;
+    color: #FFFF00;
+    border: 1px solid #FFFF00;
+}

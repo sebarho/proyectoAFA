@@ -1,0 +1,50 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El AFA</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel_="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <div id="scene-container">
+            <canvas id="game-canvas" width="800" height="386"></canvas>
+        </div>
+        <div id="ui-container">
+            <div id="main-ui-area">
+                <div id="dialogue-box">
+                    <p id="dialogue-text"></p>
+                </div>
+                <div id="verb-bar">
+                    <button class="verb-button">Dar</button>
+                    <button class="verb-button">Agarrar</button>
+                    <button class="verb-button">Usar</button>
+                    <button class="verb-button">Abrir</button>
+                    <button class="verb-button">Mirar</button>
+                    <button class="verb-button">Ir a</button>
+                    <button class="verb-button">Cerrar</button>
+                    <button class="verb-button">Hablar con</button>
+                    <button class="verb-button">Tocar bulto</button>
+                </div>
+                <div id="dialogue-options-container"></div>
+            </div>
+            <div id="right-panel">
+                <div id="character-switcher"></div>
+                <div id="inventory-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts del Juego -->
+    <script src="api.js"></script> 
+    <script src="data.js"></script>
+    <script src="renderer.js"></script>
+    <script src="ui.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
