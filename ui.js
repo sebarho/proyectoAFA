@@ -1,7 +1,9 @@
 // --- 5. SISTEMAS DE UI ---
 export const uiOptions = {
-    dialogueSpeed: 1
+    dialogueSpeed: 10 // milliseconds per character
 };
+
+let verbCfg;
 
 export function startDialogue(speakerName, listenerName, dependencies) {
     const { dialogueMatrix, gameState, verbBar, dialogueOptionsContainer, dialogueText } = dependencies;
@@ -78,23 +80,11 @@ export function selectDialogueOption(option, dependencies) {
     const nextNodeKey = option.leadsTo;
 
     if (nextNodeKey && nextNodeKey !== "end" && gameState.dialogue.conversation[nextNodeKey]) {
-        // OLD: Create a button to continue the conversation
-          //const continueButton = document.createElement('div');
-          //continueButton.className = 'dialogue-option';
-          //continueButton.textContent = "> (Continuar)";
-          //continueButton.addEventListener('click', () => {
-         
+        //Continue conversation branch      
         gameState.dialogue.currentNodeKey = nextNodeKey;
         updateDialogueView(dependencies);
-        //});
-        //dialogueOptionsContainer.appendChild(continueButton);
     } else {
         //End of conversation branch
-        //const endButton = document.createElement('div');
-        //endButton.className = 'dialogue-option';
-        //endButton.textContent = "> (Terminar conversación)";
-        //endButton.addEventListener('click', () => endDialogue(dependencies));
-        //dialogueOptionsContainer.appendChild(endButton);
         endDialogue(dependencies);
     }
 }
@@ -145,23 +135,26 @@ export function updateInventoryView(dependencies) {
     inventoryBox.appendChild(list);
 }
 
-export function updateDialogueText(dependencies) {
-    const { dialogueText, gameState, scenes, characters, gameData } = dependencies;
+export function updateActionText(dependencies) {
+    const { actionText, gameState, scenes, characters,objects, items, gameData } = dependencies;
     if (gameState.dialogue && gameState.dialogue.active) return;
+
+    const verbKey = gameState.actionState?.verb;
+    const verbData = verbKey ? verbCfg[verbKey] : null;
 
     const getTargetName = () => {
         if (!gameState.hoverTarget) return null;
         const { type, key } = gameState.hoverTarget;
         if (type === 'character') return characters[key].alias || characters[key].name;
-        if (type === 'item') return scenes[gameState.currentScene].items[key].name;
-        if (type === 'object') return scenes[gameState.currentScene].objects[key].name;
+        if (type === 'item') return items[key].name;
+        if (type === 'object') return objects[key].name;
         return null;
     };
 
     const targetName = getTargetName();
 
     if (gameState.actionState) {
-        let verb = gameState.actionState.replace(/_/g, ' ');
+        let verb = gameState.actionState.verb ? gameState.actionState.verb.replace(' ', '_') : '';
         let preposition = '';
         let itemText = '';
 
@@ -170,44 +163,45 @@ export function updateDialogueText(dependencies) {
             itemText = itemData ? itemData.name : gameState.activeItem.replace(/_/g, ' ');
         }
 
-        switch (gameState.actionState) {
-            case 'USAR':
-                verb = 'Usar';
-                preposition = 'en';
-                break;
-            case 'DAR':
-                verb = 'Dar';
-                preposition = 'a';
-                break;
-            case 'TALK_TO':
-                verb = 'Hablar';
-                preposition = 'con';
-                break;
-            case 'LLEVAR':
-                verb = 'Llevar';
-                preposition = 'a';
-                break;
-            default:
-                verb = verb.charAt(0).toUpperCase() + verb.slice(1).toLowerCase();
-                break;
+        //OLD:
+        // switch (gameState.actionState) {
+        //     case 'USAR':
+        //         verb = 'Usar';
+        //         preposition = 'en';
+        //         break;
+        //     case 'DAR':
+        //         verb = 'Dar';
+        //         preposition = 'a';
+        //         break;
+        //     case 'TALK_TO':
+        //         verb = 'Hablar';
+        //         preposition = 'con';
+        //         break;
+        //     case 'LLEVAR':
+        //         verb = 'Llevar';
+        //         preposition = 'a';
+        //         break;
+        //     default:
+        //         verb = verb.charAt(0).toUpperCase() + verb.slice(1).toLowerCase();
+        //         break;
+        // }
+
+        let finalText = '';
+        if (verbData) {
+            finalText = verbData.display;
+            if (itemText) finalText += ` ${itemText}`;
+            if (verbData.preposition) finalText += ` ${verbData.preposition}`;
+            finalText += ` ${targetName || '...'}`;
+        } else if (targetName) {
+            finalText = targetName;
         }
 
-        let finalText = verb;
-        if (itemText) {
-            finalText += ` ${itemText}`;
-        }
-        if (preposition) {
-            finalText += ` ${preposition}`;
-        }
-        
-        finalText += ` ${targetName || '...'}`;
-        
-        dialogueText.textContent = finalText;
+       actionText.textContent = finalText.trim();
 
     } else if (targetName) {
-        dialogueText.textContent = targetName;
+        actionText.textContent = targetName;
     } else {
-        dialogueText.textContent = '';
+        actionText.textContent = '';
     }
 }
 
@@ -254,4 +248,19 @@ function getItemData(itemName, gameData) {
     // We can return a default object or null
     return { name: itemName.replace(/_/g, ' ') };
     // return null
+}
+
+export function createVerbButtons(vc) {
+    verbCfg = vc; // Store verb configuration globally
+
+    const verbBar = document.getElementById('verb-bar');
+    verbBar.innerHTML = ''; // Clear existing buttons
+
+    Object.entries(verbCfg).forEach(([key, config]) => {
+        const button = document.createElement('button');
+        button.textContent = config.label;
+        button.className = 'verb-button';
+        //button.addEventListener('click', () => handleVerbClick(key));
+        verbBar.appendChild(button);
+    });
 }

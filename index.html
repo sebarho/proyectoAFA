@@ -12,35 +12,33 @@
 </head>
 <body>
     <div id="game-container">
+        <div id="dialogue-box">
+            <p id="dialogue-text"></p>
+        </div>
         <div id="scene-container">
-            <canvas id="game-canvas" width="800" height="386"></canvas>
+            <canvas id="game-canvas" width="800" height="350"></canvas>
         </div>
         <div id="ui-container">
+            <div id="left-panel">
+                <div id="character-switcher"></div>
+            </div>
             <div id="main-ui-area">
-                <div id="dialogue-box">
-                    <p id="dialogue-text"></p>
+                <div id="action-box">
+                    <p id="action-text"></p>
                 </div>
                 <div id="verb-bar">
-                    <button class="verb-button">Dar</button>
-                    <button class="verb-button">Agarrar</button>
-                    <button class="verb-button">Usar</button>
-                    <button class="verb-button">Abrir</button>
-                    <button class="verb-button">Mirar</button>
-                    <button class="verb-button">Ir a</button>
-                    <button class="verb-button">Cerrar</button>
-                    <button class="verb-button">Hablar con</button>
-                    <button class="verb-button">Tocar bulto</button>
+                  <!-- Se completa dinamicamente con los botones -->
                 </div>
                 <div id="dialogue-options-container"></div>
             </div>
             <div id="right-panel">
-                <div id="character-switcher"></div>
                 <div id="inventory-box"></div>
             </div>
         </div>
     </div>
 
     <!-- Scripts del Juego -->
+    <script type="module" src="runtime.js"></script>
     <script type="module" src="renderer.js"></script>
     <script type="module" src="data.js"></script>
     <script type="module" src="ui.js"></script>

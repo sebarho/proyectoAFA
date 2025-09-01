@@ -1,8 +1,18 @@
-const gameOptions = {
-        opTextTimeOut: 3000 // Tiempo que tarda en desaparecer solo el ultimo dialogo en milisegundos.
-};
+/// DIrectiva para que el editor detecte las funciones de api.js
+/// <reference path="./game.js" /> 
 
-const gameData = {
+import { runActionScript,
+        gameState,
+         getGameState
+ } from "./game.js";
+
+
+export const gameData = {
+    inits : {
+        player: 'Pancho',
+        scene: 'quincho'
+    },
+    
     characters: {
         'Pancho': {
             name: 'Pancho', alias: 'Pancho', description: "Pancho: El Anfitrión.",
@@ -58,55 +68,79 @@ const gameData = {
             x: -1000, y: -1000, width: 28, height: 95, skinColor: '#E0AC69', shirtColor: '#556B2F', pantsColor: '#463321', hairColor: '#4F2A15'
         }
     },
+
+    objects: {
+        'parrilla': { name: 'Parrilla', x: 650, y: 220, width: 100, height: 100, description: "La parrilla. El altar de El AFA. Todavía está apagada.", hasCarbon: false, isLit: false },
+        'mesa': { name: 'Mesa', x: 175, y: 290, width: 350, height: 60, description: "Una mesa. Ideal para apoyar los codos y criticar." },
+        'salida_patio': { name: 'Salida al Patio', x: 780, y: 150, width: 20, height: 160, description: "Hacia el verde césped." },
+        'salida_cocina': { name: 'Entrada a la Cocina', x: 0, y: 150, width: 20, height: 160, description: "A la cocina, donde nacen las ensaladas." },
+        'pileta': { name: 'Pileta', x: 400, y: 250, width: 300, height: 100, color: '#0000FF', description: "Una pileta. Ideal para refrescarse." },
+        'entrada_quincho': { name: 'Entrada al Quincho', x: 0, y: 150, width: 20, height: 160, description: "De vuelta a la acción." },
+        'heladera': { name: 'Heladera', x: 100, y: 120, width: 120, height: 190, description: "Una heladera de donde suelen salir cosas maravillosas.", isStuck: true, isOpen: false, image: 'assets/images/objects/heladera_cerrada.png', imageOpen: 'assets/images/objects/heladera_abierta.png' },
+        'mesada': { name: 'Mesada', x: 250, y: 250, width: 400, height: 60, description: "La mesada. Llena de cosas a medio preparar." },
+        'salida_quincho': { name: 'Salida al Quincho', x: 780, y: 150, width: 20, height: 160, description: "Volver con los muchachos." }
+    },
+
+    items: {
+        'vaso_fernet': { name: 'Vaso de fernet', x: 180, y: 280, width: 15, height: 20, color: '#2A1A10', description: "Un vaso de fernet. Vacío. Un clásico.", canBePickedUp: true },
+        'botella_fernet': { name: 'Botella de Fernet', x: 200, y: 250, width: 20, height: 50, color: '#1A0A00', description: "Fernet Branca. El elixir de los dioses cordobeses.", canBePickedUp: true },
+        'coca_cola': { name: 'Botella de Coca-Cola', x: 230, y: 250, width: 20, height: 45, color: '#A00000', description: "Una Coca-Cola. La compañera inseparable del fernet.", canBePickedUp: true },
+        'vino_tinto': { name: 'Vino Tinto', x: 280, y: 250, width: 20, height: 48, color: '#7B1113', description: "Un vino tinto. Para paladares sofisticados.", canBePickedUp: true },
+        'vino_blanco': { name: 'Vino Blanco', x: 310, y: 250, width: 20, height: 48, color: '#F1E5AC', description: "Un vino blanco. Refrescante.", canBePickedUp: true },
+        'papas_fritas': { name: 'Papas Fritas', x: 380, y: 280, width: 40, height: 20, color: '#FFD700', description: "Un bowl con papas fritas. Imposible comer solo una.", canBePickedUp: true },
+        'mani': { name: 'Maní', x: 430, y: 280, width: 40, height: 20, color: '#D2B48C', description: "Un bowl con maní. El clásico de la picada.", canBePickedUp: true },
+        'encendedor': { name: 'Encendedor', x: -100, y: -100, width: 15, height: 25, color: '#FFD700', description: "Un encendedor. Siempre útil.", canBePickedUp: true, isHidden: true },
+        'pala_jardin': { name: 'Pala de Jardín', x: 350, y: 300, width: 25, height: 60, color: '#8B4513', description: "Una pala de jardín. Parece resistente.", canBePickedUp: true },
+        'bolsa_carbon': { name: 'Bolsa de Carbón', x: 380, y: 300, width: 40, height: 50, color: '#3D2B1F', description: "Una bolsa de carbón. Indispensable.", canBePickedUp: true },
+        'carne': { name: 'Carne', x: 125, y: 200, width: 70, height: 40, color: '#800000', description: "El corazón de El AFA. Unos buenos cortes de vacío y tira de asado.", canBePickedUp: true, isHidden: true }
+    },
+
     scenes: {
         'quincho': {
             name: 'Quincho',
             background: { wall: '#A0522D', floor: '#5C4033' },
-            objects: {
-                'parrilla': { name: 'Parrilla', x: 650, y: 220, width: 100, height: 100, description: "La parrilla. El altar de El AFA. Todavía está apagada.", hasCarbon: false, isLit: false },
-                'mesa': { name: 'Mesa', x: 175, y: 290, width: 350, height: 60, description: "Una mesa. Ideal para apoyar los codos y criticar." },
-                'salida_patio': { name: 'Salida al Patio', x: 780, y: 150, width: 20, height: 160, description: "Hacia el verde césped." },
-                'salida_cocina': { name: 'Entrada a la Cocina', x: 0, y: 150, width: 20, height: 160, description: "A la cocina, donde nacen las ensaladas." }
-            },
-            items: {
-                'vaso_fernet': { name: 'Vaso de fernet', x: 180, y: 280, width: 15, height: 20, color: '#2A1A10', description: "Un vaso de fernet. Vacío. Un clásico.", canBePickedUp: true },
-                'botella_fernet': { name: 'Botella de Fernet', x: 200, y: 250, width: 20, height: 50, color: '#1A0A00', description: "Fernet Branca. El elixir de los dioses cordobeses.", canBePickedUp: true },
-                'coca_cola': { name: 'Botella de Coca-Cola', x: 230, y: 250, width: 20, height: 45, color: '#A00000', description: "Una Coca-Cola. La compañera inseparable del fernet.", canBePickedUp: true },
-                'vino_tinto': { name: 'Vino Tinto', x: 280, y: 250, width: 20, height: 48, color: '#7B1113', description: "Un vino tinto. Para paladares sofisticados.", canBePickedUp: true },
-                'vino_blanco': { name: 'Vino Blanco', x: 310, y: 250, width: 20, height: 48, color: '#F1E5AC', description: "Un vino blanco. Refrescante.", canBePickedUp: true },
-                'papas_fritas': { name: 'Papas Fritas', x: 380, y: 280, width: 40, height: 20, color: '#FFD700', description: "Un bowl con papas fritas. Imposible comer solo una.", canBePickedUp: true },
-                'mani': { name: 'Maní', x: 430, y: 280, width: 40, height: 20, color: '#D2B48C', description: "Un bowl con maní. El clásico de la picada.", canBePickedUp: true },
-                'encendedor': { name: 'Encendedor', x: -100, y: -100, width: 15, height: 25, color: '#FFD700', description: "Un encendedor. Siempre útil.", canBePickedUp: true, isHidden: true }
-            },
+            objects: [
+                'parrilla',
+                'mesa',
+                'salida_patio',
+                'salida_cocina'
+            ],
+            items: [
+                'vaso_fernet',
+                'botella_fernet',
+                'coca_cola',
+                'vino_tinto',
+                'vino_blanco',
+                'papas_fritas',
+                'mani',
+                'encendedor'
+            ],
             characters: ['Pancho', 'Sebastian', 'Juan', 'JuanMa', 'Bocha', 'Ale', 'Federico', 'Rata', 'Pelu', 'Locura', 'Pol', 'Muñeco']
         },
         'patio': {
             name: 'Patio',
             background: { wall: '#87CEEB', floor: '#228B22' },
-            objects: {
-                'pileta': { name: 'Pileta', x: 400, y: 250, width: 300, height: 100, color: '#0000FF', description: "Una pileta. Ideal para refrescarse." },
-                'entrada_quincho': { name: 'Entrada al Quincho', x: 0, y: 150, width: 20, height: 160, description: "De vuelta a la acción." }
-            },
-            items: {
-                'pala_jardin': { name: 'Pala de Jardín', x: 350, y: 300, width: 25, height: 60, color: '#8B4513', description: "Una pala de jardín. Parece resistente.", canBePickedUp: true },
-                'bolsa_carbon': { name: 'Bolsa de Carbón', x: 380, y: 300, width: 40, height: 50, color: '#3D2B1F', description: "Una bolsa de carbón. Indispensable.", canBePickedUp: true }
-            },
+            objects: [
+                'pileta',
+                'entrada_quincho'
+            ],
+            items: [
+                'pala_jardin',
+                'bolsa_carbon'
+            ],
             characters: []
         },
         'cocina': {
             name: 'Cocina',
             background: { wall: '#F5F5DC', floor: '#D2B48C' },
-            objects: {
-                'heladera': { name: 'Heladera', x: 100, y: 120, width: 120, height: 190, description: "Una heladera de donde suelen salir cosas maravillosas.", isStuck: true, isOpen: false, image: 'assets/images/objects/heladera_cerrada.png', imageOpen: 'assets/images/objects/heladera_abierta.png' },
-                'mesada': { name: 'Mesada', x: 250, y: 250, width: 400, height: 60, description: "La mesada. Llena de cosas a medio preparar." },
-                'salida_quincho': { name: 'Salida al Quincho', x: 780, y: 150, width: 20, height: 160, description: "Volver con los muchachos." }
-            },
-            items: {
-                'carne': { name: 'Carne', x: 125, y: 200, width: 70, height: 40, color: '#800000', description: "El corazón de El AFA. Unos buenos cortes de vacío y tira de asado.", canBePickedUp: true, isHidden: true }
-            },
+            objects: ['heladera','mesada','salida_quincho'],
+            items: [
+                'carne'
+            ],
             characters: []
         }
     },
+
     dialogueMatrix: {
         'Sebastian': {
             start: [
@@ -563,6 +597,11 @@ const gameData = {
                 return "No parece necesario usar la pala aquí.";
             }
         },
+        'usar_bolsa_carbon_en_parrilla':(dependencies) => {
+            const parrilla = dependencies.scenes.quincho.objects.parrilla;
+            parrilla.hasCarbon = true;
+            return "EL carbon ya esta puesto";
+        },
         'usar_encendedor_en_parrilla': (dependencies) => {
             const { scenes, gameState } = dependencies;
             const parrilla = scenes.quincho.objects.parrilla;
@@ -577,7 +616,7 @@ const gameData = {
                 return "No funciona.";
             }
         },
-        'llevar_carne_a_parrilla': (dependencies) => {
+        'usar_carne_en_parrilla': (dependencies) => {
             const { scenes, gameState } = dependencies;
             const parrilla = scenes.quincho.objects.parrilla;
             if (gameState.currentPlayer === 'Rata') {
@@ -591,6 +630,34 @@ const gameData = {
             } else {
                 return "De la parrilla se encarga el Rata.";
             }
+        },
+        'pancho_mirar_parrilla': () => {
+            console.log("Ejecutando script: pancho_mirar_parrilla");
+            const parrilla = gameData.objects.parrilla;
+            if (parrilla.isLit) {
+                return "La parrilla está encendida y lista para usar.";
+            } else {
+                return "La parrilla está apagada. Parece que no hay fuego.";
+            }
+        },
+        'generic_nopuedo': () => {
+            console.log("ejecutando script: generic_nopuedo");
+            return "Mmmm.... No puedo hacer eso.";
+        },
+        'generic_description': () => {
+            console.log("Ejecutando script: generic_description");
+            const gs = getGameState();
+            console.log("gs:" + gs.to + "item: " + gs.actionState.item + " target: " + gs.actionState.target);
+            return gameData.items[gs.actionState.item].description;
+        },
+        'pancho_agarrar_mesa':() => {
+            console.log("Ejecutando script: pancho_agarrar_mesa");
+            return runActionScript("generic_nopuedo");
+        },
+        'pancho_mirar_mesa': () => {
+            console.log("Ejecutando script: pancho_mirar_mesa");
+            return runActionScript("generic_description");
         }
+
     }
 };

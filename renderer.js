@@ -1,3 +1,7 @@
+import { getSceneItems, getSceneObjects } from "./game.js";
+import { gameData} from "./data.js";
+
+
 let imageAssets = {};
 let imagesToLoad = 0;
 let imagesLoaded = 0;
@@ -51,7 +55,7 @@ export function loadAssets(imagePaths, callback) {
 export function drawScene(dependencies) {
     ///
     console.log('renderer.js: drawScene called.');
-    const { ctx, scenes, characters, gameState } = dependencies;
+    const { ctx, scenes, characters, items, objects, gameState } = dependencies;
     const scene = scenes[gameState.currentScene];
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -60,33 +64,41 @@ export function drawScene(dependencies) {
     ctx.fillStyle = scene.background.wall; 
     ctx.fillRect(0, 0, ctx.canvas.width, 310);
 
-    if (gameState.currentScene === 'quincho') {
-        const brickWidth = 40;
-        const brickHeight = 15;
-        const wallWidth = ctx.canvas.width;
-        const wallHeight = 310;
-        ctx.fillStyle = '#A0522D'; // Dark orange for brick background
-        ctx.fillRect(0, 0, wallWidth, wallHeight);
+    //OLD:
+    // if (gameState.currentScene === 'quincho') {
+    //     const brickWidth = 40;
+    //     const brickHeight = 15;
+    //     const wallWidth = ctx.canvas.width;
+    //     const wallHeight = 310;
+    //     ctx.fillStyle = '#A0522D'; // Dark orange for brick background
+    //     ctx.fillRect(0, 0, wallWidth, wallHeight);
 
-        ctx.strokeStyle = '#8B4513'; // Dark brown for mortar
-        ctx.lineWidth = 1;
+    //     ctx.strokeStyle = '#8B4513'; // Dark brown for mortar
+    //     ctx.lineWidth = 1;
 
-        for (let y = 0; y < wallHeight; y += brickHeight) {
-            for (let x = 0; x < wallWidth; x += brickWidth) {
-                let offsetX = (y / brickHeight) % 2 === 0 ? 0 : brickWidth / 2;
-                ctx.strokeRect(x - offsetX, y, brickWidth, brickHeight);
-            }
-        }
-    }
+    //     for (let y = 0; y < wallHeight; y += brickHeight) {
+    //         for (let x = 0; x < wallWidth; x += brickWidth) {
+    //             let offsetX = (y / brickHeight) % 2 === 0 ? 0 : brickWidth / 2;
+    //             ctx.strokeRect(x - offsetX, y, brickWidth, brickHeight);
+    //         }
+    //     }
+    // }
 
     ctx.fillStyle = scene.background.floor; 
     ctx.fillRect(0, 310, ctx.canvas.width, ctx.canvas.height - 310);
 
+    //ORIGINAL:
+    // const drawOrder = [
+    //     ...Object.entries(scene.objects).map(([key, data]) => ({ key, data, type: 'object' })),
+    //     ...Object.entries(scene.items).filter(([, data]) => !data.isHidden).map(([key, data]) => ({ key, data, type: 'item' })),
+    //     ...scene.characters.map(charKey => ({ key: charKey, data: characters[charKey], type: 'character' }))
+    // ].sort((a, b) => (a.data.y + (a.data.height || 0)) - (b.data.y + (b.data.height || 0)));
+
     const drawOrder = [
-        ...Object.entries(scene.objects).map(([key, data]) => ({ key, data, type: 'object' })),
-        ...Object.entries(scene.items).filter(([, data]) => !data.isHidden).map(([key, data]) => ({ key, data, type: 'item' })),
+        ...scene.items.map(itemKey => ({ key: itemKey, data: items[itemKey], type: 'item' })),
+        ...scene.objects.map(objectKey => ({ key: objectKey, data: objects[objectKey], type: 'object' })),
         ...scene.characters.map(charKey => ({ key: charKey, data: characters[charKey], type: 'character' }))
-    ].sort((a, b) => (a.data.y + (a.data.height || 0)) - (b.data.y + (b.data.height || 0)));
+    ].sort((a, b) => (a.y + (a.height || 0)) - (b.y + (b.height || 0)));
 
     drawOrder.forEach(obj => {
         if (!obj.data) return; // Prevents crash if character data is missing

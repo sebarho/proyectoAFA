@@ -37,20 +37,34 @@ body {
 }
 
 #main-ui-area {
-    width: 70%;
+    width: 60%;
     display: flex;
     flex-direction: column;
 }
 
 #dialogue-box {
-    height: 60%;
-    padding: 10px;
+    height: 15%;
+    padding: 5px;
     box-sizing: border-box;
     border-bottom: 4px solid #555;
     color: #00FFFF; /* Cyan */
     text-align: center;
-    font-size: 12px;
+    font-size: 10px;
     overflow-y: auto; /* Add scroll for overflow */
+    line-height: 1.4;
+}
+
+#action-box {
+    height: 40%;
+    padding: 10px;
+    box-sizing: border-box;
+    border-bottom: 4px solid #555;
+    color: #00FFFF;
+    /* Cyan */
+    text-align: center;
+    font-size: 10px;
+    overflow-y: auto;
+    /* Add scroll for overflow */
     line-height: 1.4;
 }
 
@@ -85,8 +99,16 @@ body {
     font-family: inherit;
     cursor: pointer;
     text-align: center;
+    font-size: 0.9em;
 }
 .verb-button:hover { background-color: #777; color: #FFFF00; }
+
+#left-panel {
+    width: 30%;
+    border-right: 4px solid #555;
+    display: flex;
+    flex-direction: column;
+}
 
 #right-panel {
     width: 30%;
@@ -96,16 +118,15 @@ body {
 }
 
 #character-switcher {
-    height: 50%;
-    padding: 5px;
+    height: 100%;
+    padding: 0%;
     text-align: center;
     overflow-y: auto;
 }
 
 #inventory-box {
-    height: 50%;
-    border-top: 4px solid #555;
-    padding: 5px;
+    height: 100%;
+    padding: 0px;
     text-align: center;
     overflow-y: auto;
 }
@@ -119,6 +140,7 @@ body {
     border: 1px solid #888;
     cursor: pointer;
     font-size: 0.9em;
+    list-style-type: none;
 }
 
 .character-avatar:hover, .inventory-item:hover { background-color: #666; }

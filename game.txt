@@ -10,12 +10,7 @@ import {
     createVerbButtons
 } from './ui.js';
 
-import { gameState } from './runtime.js';
-
-
-import { gameData, 
-        storyScripts 
-} from './data.js';
+import { gameData } from './data.js';
 
 const verbConfig = {
     'DAR': {        label: 'Dar',
@@ -61,23 +56,21 @@ const verbConfig = {
                     expects: ['character'] 
     },
 };
-/**
-// export const gameState = {
-//     currentPlayer: null,
-//     currentScene: null,
-//     actionState: {
-//         verb: null,
-//         item: null,
-//         target: null
-//     },
-//     activeItem: null,
-//     inventories: {null: []}, // Inventario por personaje
-//     hoverTarget: null,
-//     dialogue: null,
-//     lastInteractionTime: Date.now(),
-// };  
-*/
 
+export const gameState = {
+    currentPlayer: null,
+    currentScene: null,
+    actionState: {
+        verb: null,
+        item: null,
+        target: null
+    },
+    activeItem: null,
+    inventories: {null: []}, // Inventario por personaje
+    hoverTarget: null,
+    dialogue: null,
+    lastInteractionTime: Date.now(),
+};  
 
 //////////////////////////////////////////////////////////////////////////////////////
 ///
@@ -190,9 +183,9 @@ document.addEventListener('DOMContentLoaded', () => {
         function handleVerbClick(verb) {
             const newVerb = verb.toUpperCase().replace(' ', '_');
             if (gameState.actionState.verb === newVerb) {
-                gameState.actionState = { verb: null, item: { key: null, type: null }, target: { key: null, type: null } };
+                gameState.actionState = { verb: null, item: null, target: null };
             } else {
-                gameState.actionState = { verb: newVerb, item: { key: null, type: null }, target: { key: null, type: null } };
+                gameState.actionState = { verb: newVerb, item: null, target: null };
             }
             updateActionText(dependencies, verbConfig);
         }
@@ -215,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             // Selección del primer argumento (puede ser item, object o character según el verbo)
-            if (!gameState.actionState.item.key && !gameState.actionState.target.key) {
+            if (!gameState.actionState.item && !gameState.actionState.target) {
                 // ¿Qué tipos acepta el verbo como primer argumento?
                 let firstExpected = config.expects[0];
                 // Si es un array (varios tipos posibles)
@@ -224,13 +217,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (firstExpected.includes(target.type)) {
                             console.log('Primer argumento válido: [' + target.type + '] ' + target.key);
                             // Guarda el argumento en el campo correcto
-                            if (target.type === 'item') {
-                                gameState.actionState.item.key = target.key;
-                                gameState.actionState.item.type = target.type;
-                            } else {
-                                gameState.actionState.target.key = target.key;
-                                gameState.actionState.target.type = target.type;
-                            }
+                            if (target.type === 'item') gameState.actionState.item = target.key;
+                            else gameState.actionState.target = target.key; // para verbos como HABLAR
                             updateActionText(dependencies, verbConfig);
 
                             // Si solo requiere un argumento, ejecuta la acción
@@ -246,13 +234,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Solo un tipo permitido
                     if (target.type === firstExpected) {
                         console.log('Primer argumento válido:', target.type, target.key);
-                        if (target.type === 'item') {
-                            gameState.actionState.item.key = item.key;
-                            gameState.actionState.item.type = item.type;
-                        } else {
-                            gameState.actionState.target.key = target.key;
-                            gameState.actionState.target.type = target.type;
-                        }
+                        if (target.type === 'item') gameState.actionState.item = target.key;
+                        else gameState.actionState.target = target.key;
                         updateActionText(dependencies, verbConfig);
 
                         if (config.expects.length === 1 && !config.optional) {
@@ -271,16 +254,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Si el verbo permite un segundo objeto opcional
                 if (config.optional && config.optional.includes(target.type)) {
                     console.log('Segundo argumento opcional válido:', target.type, target.key);
-                    gameState.actionState.target.key = target.key;
-                    gameState.actionState.target.type = target.type;
+                    gameState.actionState.target = target.key;
                     handleActionClick(dependencies);
                     return;
                 }
                 // Si el verbo requiere un target específico
                 if (config.expects[1] && target.type === config.expects[1]) {
                     console.log('Segundo argumento requerido válido:', target.type, target.key);
-                    gameState.actionState.target.key = target.key;
-                    gameState.actionState.target.type = target.type;
+                    gameState.actionState.target = target.key;
                     handleActionClick(dependencies);
                     return;
                 }
@@ -326,13 +307,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     //Generamos el nombre del action-script con VERBO_ITEM_TARGET
                     let actionScriptName = gameState.currentPlayer +"_"+`${verb}`;
-                    if (item.key != null) {
-                        actionScriptName += `_${item.key}`;
-                        console.log('Item: ' + item.key);
+                    if (item != null) {
+                        actionScriptName += `_${item}`;
+                        console.log('Item: ' + item);
                     }
-                    if (target.key != null) {
-                        actionScriptName += `_${target.key}`;
-                        console.log('Target: ' + target.key);
+                    if (target != null) {
+                        actionScriptName += `_${target}`;
+                        console.log('Target: ' + target);
                     }
                     actionScriptName = actionScriptName.toLowerCase();
                     console.log('Nombre del action-script:', actionScriptName);
@@ -471,13 +452,13 @@ document.addEventListener('DOMContentLoaded', () => {
             //          break;
             // }
                     
-            
-            //if (!dialogueStarted && !(actionResultText.includes("GANASTE"))) { //TODO: Cambiar esto. el fin del juego de hacerse con un script
-            
-                    dependencies.dialogueText.textContent = runActionScript(actionScriptName);
-            //}
-                    gameState.actionState = { verb: null, item: { key: null, type: null }, target: { key: null, type: null } };
+                    gameState.actionState = { verb: null, item: null, target: null };
 
+                    //if (!dialogueStarted && !(actionResultText.includes("GANASTE"))) { //TODO: Cambiar esto. el fin del juego de hacerse con un script
+                        
+                    dependencies.dialogueText.textContent = runActionScript(actionScriptName);
+                    //}
+                    
                     //if (!actionResultText.includes("GANASTE")) { //TODO: El fin del juego debe controlarse con un script
                     //    gameState.actionState = { verb: null, item: null, target: null };
                     //    gameState.activeItem = null;
@@ -548,16 +529,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 export function runActionScript (name){
     //Ejecutamos el script que devuelve un texto:
-    if (storyScripts[name]) {
+    const puzzles = gameData.puzzles;
+    if (puzzles[name]) {
         console.log("El script existe");
-        return storyScripts[name]();
+        return puzzles[name]();
     } else {
         console.log("El script no existe");
         return "";
     }
 }
 
-
+export function getGameState () {
+    console.log("Estado del juego:", gameState.actionState.item, gameState.actionState.target);
+    return gameState;
+}
 
 export function getSceneItems(data, sceneName) {
     const scene = data.scenes[sceneName];
