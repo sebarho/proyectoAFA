@@ -131,6 +131,38 @@ body {
     overflow-y: auto;
 }
 
+/* Estilo para la lista del inventario */
+#inventory-box ul#inventory-list {
+    list-style-type: none;
+    /* Quita los puntitos */
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    /* Centra el texto */
+}
+
+/* Estilo para cada ítem del inventario */
+.inventory-item {
+    margin: 6px 0;
+    padding: 5px 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    /* Estilo retro */
+    background-color: #f0f0f0;
+    display: inline-block;
+    width: 90%;
+    /* Permite centrar como bloque */
+}
+
+/* Ítem activo */
+.inventory-item.active {
+    background-color: #d0eaff;
+    border-color: #00aaff;
+    font-weight: bold;
+    color: #005577;
+    text-decoration: underline;
+}
+
 #right-panel h3 { margin: 0 0 10px 0; font-size: 1em; color: #FF00FF; }
 
 .character-avatar, .inventory-item {

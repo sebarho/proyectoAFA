@@ -76,8 +76,7 @@ export function loadAssets(imagePaths, callback) {
         }
 
         // Se ejecuta el callback final solo cuando todas las imágenes fueron procesadas
-        console.log('renderer.js: All images preloaded (preloades or failed).');
-        callback(); //<- recien aca vuelve a gameInit
+        callback();
     });
 }
 
