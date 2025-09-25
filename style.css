@@ -36,22 +36,19 @@ body {
     background-color: #222;
 }
 
-#main-ui-area {
+#action-container {
+    height: 100%;
+    width: 100%;
+    padding: 0px;
+    display: flex;
+    /*flex-direction: column;*/
+    gap: 4px;
+}
+
+#center-panel {
     width: 60%;
     display: flex;
     flex-direction: column;
-}
-
-#dialogue-box {
-    height: 15%;
-    padding: 5px;
-    box-sizing: border-box;
-    border-bottom: 4px solid #555;
-    color: #00FFFF; /* Cyan */
-    text-align: center;
-    font-size: 10px;
-    overflow-y: auto; /* Add scroll for overflow */
-    line-height: 1.4;
 }
 
 #action-box {
@@ -76,7 +73,7 @@ body {
     gap: 8px;
 }
 
-#dialogue-options-container {
+#dialogue-container {
     height: 60%;
     padding: 10px;
     display: none; /* Oculto por defecto */
@@ -84,11 +81,24 @@ body {
     gap: 4px;
 }
 
+
+#dialogue-box {
+    height: 15%;
+    padding: 5px;
+    box-sizing: border-box;
+    border-bottom: 4px solid #555;
+    color: #00FFFF; /* Cyan */
+    text-align: center;
+    font-size: 10px;
+    overflow-y: auto; /* Add scroll for overflow */
+    line-height: 1.4;
+}
 .dialogue-option {
     color: #00FFFF;
     cursor: pointer;
     padding: 4px;
     border: 1px solid transparent;
+    font-size: 0.9em;
 }
 .dialogue-option:hover { border: 1px solid #FFFF00; color: #FFFF00; }
 
@@ -128,17 +138,15 @@ body {
     height: 100%;
     padding: 0px;
     text-align: center;
-    overflow-y: auto;
+    overflow-y: scroll;
 }
 
 /* Estilo para la lista del inventario */
 #inventory-box ul#inventory-list {
-    list-style-type: none;
-    /* Quita los puntitos */
+    list-style-type: none; /* Quita los puntitos */
     padding: 0;
     margin: 0;
-    text-align: center;
-    /* Centra el texto */
+    text-align: center; /* Centra el texto */
 }
 
 /* Estilo para cada ítem del inventario */
@@ -160,7 +168,7 @@ body {
     border-color: #00aaff;
     font-weight: bold;
     color: #005577;
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 #right-panel h3 { margin: 0 0 10px 0; font-size: 1em; color: #FF00FF; }

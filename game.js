@@ -7,19 +7,21 @@ import {
     updateActionText,
     setupCharacterSwitcher,
     createVerbButtons,
-    ui
+    ui,
+    configureVerbs,
+    getVerbConfig
 } from './ui.js';
-
-
 
 import {
     gameData,
     storyScripts
 } from './data.js';
 
-import { state } from './runtime.js';
+import { state,
+    globals
+} from './runtime.js';
 
-const verbConfig = {
+const vc = {
     'DAR': {
         label: 'Dar',
         display: 'Dar',
@@ -71,7 +73,8 @@ const verbConfig = {
         preposition: 'a',
         expects: ['character']
     },
-};
+}
+
 /**
 // export const state = {
 //     currentPlayer: null,
@@ -149,7 +152,7 @@ export function runActionScript(name) {
         console.log(`game.js: Running action script "${name}"`);
         return storyScripts[name]();
     }
-        // } else {
+    // } else {
     //     if (storyScripts["default"]) {
     //         console.log("Corriendo el script 'default'");
     //         return storyScripts["default"]();
@@ -173,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('game.js: DOMContentLoaded event fired. Starting game initialization.');
     gameInit();
     //gameLoop();
-    
+
 });
 
 
@@ -184,23 +187,30 @@ document.addEventListener('DOMContentLoaded', () => {
 //////////////////////////////////////////////////////////////////////////////////////
 
 function gameInit() {
-    
+
+    configureVerbs();
+
     loadAssets(recolectarRutasDeImagen(), () => {
         console.log('game.js: Initializing game after assets loaded...');
-        
+
         // Crear botones de verbo dinamicamente
-        createVerbButtons(verbConfig);
-        console.log ('game.js: Verb buttons created.');
-        
+        configureVerbs(vc)
+        createVerbButtons(getVerbConfig());
+        console.log('game.js: Verb buttons created.');
+
         // Get gameData initial state
         state.currentPlayer = gameData.inits.player;
         state.currentScene = gameData.inits.scene;
         console.log(`game.js: Initial state > player=${state.currentPlayer}, scene=${state.currentScene}`);
-       
+
         // Get the UI objects
+        ui.document = document;
+        ui.actionContainer = document.getElementById('action-container');
+        ui.actionBox = document.getElementById('action-box');
         ui.actionText = document.getElementById('action-text');
         ui.verbBar = document.getElementById('verb-bar');
-        ui.dialogueOptionsContainer = document.getElementById('dialogue-options-container');
+        ui.dialogueText = document.getElementById('dialogue-text');
+        ui.dialogueContainer = document.getElementById('dialogue-container');
         ui.characterSwitcher = document.getElementById('character-switcher');
         ui.inventoryBox = document.getElementById('inventory-box');
         ui.canvas = document.getElementById('game-canvas');
@@ -208,6 +218,8 @@ function gameInit() {
         console.log('game.js: UI objects created.');
 
         //Registra los eventos de mouse en el canvas en el Event Loop
+        ui.document.addEventListener('keydown', handleKeyPress);
+        ui.canvas.addEventListener('mouseleave', handleCanvasMouseLeave);
         ui.canvas.addEventListener('mousemove', handleCanvasMousemove);
         ui.canvas.addEventListener('click', handleCanvasClick);
         document.querySelectorAll('.verb-button').forEach(b => b.addEventListener('click', () => handleVerbClick(b.textContent)));
@@ -216,7 +228,7 @@ function gameInit() {
         //Carga los controles de personajes e inventario
         setupCharacterSwitcher();
         console.log('game.js: Character switcher set up.');
-        
+
         //updateInventoryView(ui);
         console.log('game.js: Game initialized successfully. Starting game loop.');
         requestAnimationFrame(gameLoop); // Start the game loop after initialization
@@ -234,9 +246,29 @@ function gameLoop() {
     /**
      * Main game loop, called with requestAnimationFrame
      */
-    
+
     drawScene(ui); // Draw the current scene
     requestAnimationFrame(gameLoop); // Schedule the next frame
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+///
+///    KEYBOARD FUNCTIONS
+///
+//////////////////////////////////////////////////////////////////////////////////////
+
+function handleKeyPress(e) {
+    console.log("Key pressed");
+    if (e.ctrlKey && e.key === 'd') {
+        e.preventDefault(); // Evita que el navegador guarde la página
+        //SWITCH DEBUG MODE
+        if (globals.debugMode) {
+            globals.debugMode = false;
+        } else {
+            globals.debugMode = true;
+        }
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -271,7 +303,7 @@ function handleVerbClick(verb) {
     } else {
         state.actionState = { verb: newVerb, item: { key: null, type: null }, target: { key: null, type: null } };
     }
-    updateActionText(ui, verbConfig);
+    updateActionText(ui, getVerbConfig());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -290,7 +322,7 @@ function handleCanvasClick(event) {
         return;
     }
 
-    const config = verbConfig[verb];
+    const config = getVerbConfig()[verb];
     if (!config) {
         console.log('Verbo no configurado:', verb);
         return;
@@ -312,12 +344,12 @@ function handleCanvasClick(event) {
                         state.actionState.target.key = target.key;
                         state.actionState.target.type = target.type;
                     }
-                    updateActionText(ui, verbConfig);
+                    updateActionText(ui, getVerbConfig());
 
                     // Si solo requiere un argumento, ejecuta la acción
                     if (config.expects.length === 1 && !config.optional) {
                         console.log('Ejecutando acción con un solo argumento');
-                        handleActionClick(ui);
+                        parseAction(ui);
                     }
                     return;
                 }
@@ -334,11 +366,11 @@ function handleCanvasClick(event) {
                     state.actionState.target.key = target.key;
                     state.actionState.target.type = target.type;
                 }
-                updateActionText(verbConfig);
+                updateActionText(getVerbConfig());
 
                 if (config.expects.length === 1 && !config.optional) {
                     console.log('Ejecutando acción con un solo argumento');
-                    handleActionClick();
+                    parseAction();
                 }
                 return;
             }
@@ -354,20 +386,20 @@ function handleCanvasClick(event) {
             console.log('Segundo argumento opcional válido:', target.type, target.key);
             state.actionState.target.key = target.key;
             state.actionState.target.type = target.type;
-            handleActionClick()
+            parseAction()
         }
         // Si el verbo requiere un target específico
         if (config.expects[1] && target.type === config.expects[1]) {
             console.log('Segundo argumento requerido válido:', target.type, target.key);
             state.actionState.target.key = target.key;
             state.actionState.target.type = target.type;
-            handleActionClick();
+            parseAction();
             return;
         }
         // Si no se requiere segundo objeto, ejecuta la acción
         if (!config.expects[1]) {
             console.log('Ejecutando acción con un solo argumento (sin segundo requerido)');
-            handleActionClick();
+            parseAction();
             return;
         }
         console.log('Segundo argumento NO válido:', target?.type, target?.key);
@@ -376,12 +408,13 @@ function handleCanvasClick(event) {
 
 
 //////////////////////////////////////////////////////////////////////////////////////
-function handleActionClick() {
+
+export function parseAction() {
     let actionResultText = "";
     let dialogueStarted = false;
-    console.log('handleActionClick: Ejecutando acción:', state.actionState);
+    console.log('parseAction: Ejecutando acción:', state.actionState);
 
-    
+
     if (state != null) {
         if (state.actionState != null) {
             const { verb, item, target } = state.actionState;
@@ -409,13 +442,15 @@ function handleActionClick() {
                 actionScriptName = actionScriptName.toLowerCase();
                 if (storyScripts[actionScriptName]) {
                     console.log('Ejecutando script alternativo:', actionScriptName);
-                } else  {   
+                } else {
                     // Si no existe probamos el action-script 'default'
-                console.log('No existe el script:', actionScriptName);
-                actionScriptName = "default";}
+                    console.log('No existe el script:', actionScriptName);
+                    actionScriptName = "default";
+                }
             }
             const r = runActionScript(actionScriptName);
             state.actionState = { verb: null, item: { key: null, type: null }, target: { key: null, type: null } };
+            updateActionText();
 
         }
     }
@@ -427,8 +462,13 @@ function handleCanvasMousemove(event) {
     if (state.dialogue && state.dialogue.active) return;
     const rect = ui.canvas.getBoundingClientRect();
     state.hoverTarget = getTargetAt(event.clientX - rect.left, event.clientY - rect.top);
-    updateActionText(verbConfig);
+    updateActionText();//verbConfig);
     //ui.fullRedraw();
+}
+
+function handleCanvasMouseLeave(event) {
+    state.hoverTarget = null;
+    updateActionText();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

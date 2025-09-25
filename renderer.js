@@ -1,4 +1,4 @@
-import { state as gameState } from "./runtime.js";
+import { state as gameState, globals } from "./runtime.js";
 import { gameData } from "./data.js";
 
 let imageAssets = {};
@@ -86,20 +86,20 @@ export function loadAssets(imagePaths, callback) {
 export function drawScene(ui) {
     ///
     console.log('renderer.js: drawScene called.');
-    
+
     if (!ui.ctx) {
         console.warn('drawScene: ui.ctx is null. Skipping draw.');
         return;
     }
 
-    
+
     //const { ctx, scenes, characters, items, objects, gameState } = ui;
     const scene = gameData.scenes[gameState.currentScene];
 
     ui.ctx.clearRect(0, 0, ui.ctx.canvas.width, ui.ctx.canvas.height);
-    
+
     // Draw background (wall and floor)
-    ui.ctx.fillStyle = scene.background.wall; 
+    ui.ctx.fillStyle = scene.background.wall;
     ui.ctx.fillRect(0, 0, ui.ctx.canvas.width, 310);
 
     //OLD:
@@ -122,7 +122,7 @@ export function drawScene(ui) {
     //     }
     // }
 
-    ui.ctx.fillStyle = scene.background.floor; 
+    ui.ctx.fillStyle = scene.background.floor;
     ui.ctx.fillRect(0, 310, ui.ctx.canvas.width, ui.ctx.canvas.height - 310);
 
     const drawOrder = [
@@ -134,19 +134,56 @@ export function drawScene(ui) {
     drawOrder.forEach(obj => {
         if (!obj.data) return; // Prevents crash if character data is missing
         const isHovered = gameState.hoverTarget && gameState.hoverTarget.key === obj.key;
-        switch(obj.type) {
+        switch (obj.type) {
             case 'character': drawSprite(ui.ctx, obj.data, isHovered); break;
-            case 'item':      drawItem(ui.ctx, obj.data, isHovered); break;
-            case 'object':    drawObject(ui.ctx, obj.data, isHovered); break;
+            case 'item': drawItem(ui.ctx, obj.data, isHovered); break;
+            case 'object': drawObject(ui.ctx, obj.data, isHovered); break;
         }
     });
 
     const p = gameData.characters[gameState.currentPlayer];
     if (p) {
-        ui.ctx.fillStyle = '#FFFF00'; 
-        ui.ctx.font = "10px 'Press Start 2P'"; 
+        ui.ctx.fillStyle = '#FFFF00';
+        ui.ctx.font = "10px 'Press Start 2P'";
         ui.ctx.textAlign = 'center';
         ui.ctx.fillText(p.alias || p.name, p.x + p.width / 2, p.y - 5);
+    }
+
+    printDebugInfo(ui);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+function printDebugInfo(ui) {
+    if (globals.debugMode) {
+        //Print gameState info for debug purposes.
+        ui.ctx.fillStyle = '#000000';
+        ui.ctx.font = "8px 'Press Start 2P'";
+        ui.ctx.textAlign = 'left';
+        const sep = 12;
+        let line = 1;
+        let text = "";
+        ui.ctx.fillText("Current scene: ... " + gameState.currentScene, 0, line * sep); line++;
+        ui.ctx.fillText("Current Player: .. " + gameState.currentPlayer, 0, line * sep); line++;
+        ui.ctx.fillText("Action state verb: " + gameState.actionState.verb, 0, line * sep); line++;
+        ui.ctx.fillText("Action state item: " + gameState.actionState.item.key + " [" + gameState.actionState.item.type + "]", 0, line * sep); line++;
+        ui.ctx.fillText("Action state targ: " + gameState.actionState.target.key + " [" + gameState.actionState.target.type + "]", 0, line * sep); line++;
+        text = (gameState.hoverTarget == null) ? "Null" : gameState.hoverTarget.key + " [" + gameState.hoverTarget.type + "]";
+        ui.ctx.fillText("HoverTarget: ..... " + text, 0, line * sep); line++;
+        ui.ctx.fillText("Dialogue: ........ " + gameState.dialogue, 0, line * sep); line++;
+        if (gameState.dialogue != null) {
+            ui.ctx.fillText("     Active: ..... " + gameState.dialogue.active, 0, line * sep); line++;
+            ui.ctx.fillText("     Speaker: .... " + gameState.dialogue.speaker, 0, line * sep); line++;
+            ui.ctx.fillText("     Listener: ... " + gameState.dialogue.listener, 0, line * sep); line++;
+            ui.ctx.fillText("     Conversation: " + gameState.dialogue.conversation, 0, line * sep); line++;
+            ui.ctx.fillText("     Cur Node Key: " + gameState.dialogue.currentNodeKey, 0, line * sep); line++;
+            ui.ctx.fillText("     Long: ....... " + gameState.dialogue.long, 0, line * sep); line++;
+        }
+        text = (gameState.activeItem == null) ? "Null" : gameState.activeItem.key + " [" + gameState.activeItem.type + "]";
+        ui.ctx.fillText("Active Item: ..... " + text, 0, line * sep); line++;
+        text = (gameState.inventories == null) ? "Null" : gameState.inventories;
+        ui.ctx.fillText("Inventories: ..... " + gameState.inventories, 0, line * sep); line++;
+        ui.ctx.fillText("Last Inter.  Time: " + gameState.lastInteractionTime, 0, line * sep); line++;
     }
 }
 
@@ -156,7 +193,7 @@ function drawSprite(ctx, char, isHovered) {
     if (char.image) {
         const img = imageAssets[char.image];
         if (img) {
-            if(isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
+            if (isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
             ctx.drawImage(img, char.x, char.y, char.width, char.height);
             ctx.shadowBlur = 0;
         } else {
@@ -171,29 +208,29 @@ function drawSprite(ctx, char, isHovered) {
 //////////////////////////////////////////////////////////////////////////////////////
 
 function drawColoredSprite(ctx, char, isHovered) {
-    if(isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
-    
+    if (isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
+
     const skinColor = char.skinColor || '#FF00FF';
     const shirtColor = char.shirtColor || '#FF00FF';
     const pantsColor = char.pantsColor || '#FF00FF';
 
     const headSize = char.width * 0.8;
     const headX = char.x + (char.width - headSize) / 2;
-    
+
     if (char.hairColor) {
         ctx.fillStyle = char.hairColor;
         ctx.fillRect(headX - 2, char.y - 4, headSize + 4, headSize);
     }
 
-    ctx.fillStyle = skinColor; 
+    ctx.fillStyle = skinColor;
     ctx.fillRect(headX, char.y, headSize, headSize);
-    
-    ctx.fillStyle = shirtColor; 
+
+    ctx.fillStyle = shirtColor;
     ctx.fillRect(char.x, char.y + headSize, char.width, char.height * 0.4);
-    
-    ctx.fillStyle = pantsColor; 
+
+    ctx.fillStyle = pantsColor;
     ctx.fillRect(char.x, char.y + headSize + char.height * 0.4, char.width, char.height * 0.6 - headSize);
-    
+
     ctx.shadowBlur = 0;
 }
 
@@ -203,7 +240,7 @@ function drawItem(ctx, item, isHovered) {
     if (item.image) {
         const img = imageAssets[item.image];
         if (img) {
-            if(isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
+            if (isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
             ctx.drawImage(img, item.x, item.y, item.width, item.height);
             ctx.shadowBlur = 0;
         } else {
@@ -217,7 +254,7 @@ function drawItem(ctx, item, isHovered) {
 //////////////////////////////////////////////////////////////////////////////////////
 
 function drawColoredItem(ctx, item, isHovered) {
-    if(isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
+    if (isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
     ctx.fillStyle = item.color || '#FF00FF';
     ctx.fillRect(item.x, item.y, item.width, item.height);
     ctx.shadowBlur = 0;
@@ -232,7 +269,7 @@ function drawObject(ctx, obj, isHovered) {
         const imageName = obj.isOpen ? obj.imageOpen : obj.image;
         const img = imageAssets[imageName];
         if (img) {
-            if(isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
+            if (isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
             ctx.drawImage(img, obj.x, obj.y, obj.width, obj.height);
             ctx.shadowBlur = 0;
         } else {
@@ -241,7 +278,7 @@ function drawObject(ctx, obj, isHovered) {
     } else if (obj.image) {
         const img = imageAssets[obj.image];
         if (img) {
-            if(isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
+            if (isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
             ctx.drawImage(img, obj.x, obj.y, obj.width, obj.height);
             ctx.shadowBlur = 0;
         } else {
@@ -253,7 +290,7 @@ function drawObject(ctx, obj, isHovered) {
 }
 
 function drawParrilla(ctx, obj, isHovered) {
-    if(isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
+    if (isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
 
     // Draw brick base
     const brickWidth = 15;
@@ -298,7 +335,7 @@ function drawParrilla(ctx, obj, isHovered) {
 }
 
 function drawColoredObject(ctx, obj, isHovered) {
-    if(isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
+    if (isHovered) { ctx.shadowColor = '#FFF'; ctx.shadowBlur = 10; }
 
     if (obj.name === 'Heladera') {
         ctx.fillStyle = '#FFFFFF';

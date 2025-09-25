@@ -8,7 +8,33 @@ import { runActionScript } from './game.js';
 import { state } from './runtime.js';
 import { gameData} from './data.js';
 import { drawScene } from './renderer.js';
-import { startDialogue as startDial, showDialogueLine, updateInventoryView, uiOptions } from './ui.js';
+import { startDialogue as startDial, showDialogueLine, updateInventoryView, uiOptions,
+    setupCharacterSwitcher
+} from './ui.js';
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+export function addPlayer (name) {
+    /**
+     * Makes a character playable and updates de character switcher
+     */
+    if (gameData.characters.includes(name)) {
+        gameData.characters[name].playable = true;
+        setupCharacterSwitcher;
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+export function removePlayer(name) {
+    /**
+     * Makes a character unplayable and updates de character switcher
+     */
+    if (gameData.characters.includes(name)) {
+        gameData.characters[name].playable = false;
+        setupCharacterSwitcher;
+    }
+}
 
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -64,13 +90,13 @@ export function addItemToActor(characterName, itemName) {
     }
 
     // Asegura que el inventario esté inicializado como array
-    if (!Array.isArray(character.inventories)) {
-        character.inventories = [];
+    if (!Array.isArray(character.inventory)) {
+        character.inventory = [];
     }
 
     // Evita duplicados (opcional)
-    if (!character.inventories.includes(itemName)) {
-        character.inventories.push(itemName);
+    if (!character.inventory.includes(itemName)) {
+        character.inventory.push(itemName);
         console.log(`addItemToCharacter: Se agregó "${itemName}" al inventario de "${characterName}".`);
     } else {
         console.log(`addItemToCharacter: El ítem "${itemName}" ya está en el inventario de "${characterName}".`);
@@ -87,11 +113,11 @@ export function addItemToActor(characterName, itemName) {
 export function removeItemFromActor(characterName, itemName) {
     const character = gameData.characters[characterName];
     
-    if (!character || !Array.isArray(character.inventories)) return;
+    if (!character || !Array.isArray(character.inventory)) return;
     
-    const index = character.inventories.indexOf(itemName);
+    const index = character.inventory.indexOf(itemName);
     if (index !== -1) {
-        character.inventories.splice(index, 1);
+        character.inventory.splice(index, 1);
         console.log(`removeItemFromCharacter: Se quitó "${itemName}" del inventario de "${characterName}".`);
     }
     

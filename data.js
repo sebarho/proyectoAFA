@@ -12,69 +12,84 @@ export const gameData = {
     characters: {
         'Pancho': {
             name: 'Pancho', alias: 'Pancho', description: "Pancho: El Anfitrión.",
-            inventories: [],
+            inventory: [],
             x: 100, y: 150, width: 130, height: 220,
-            image: 'assets/images/characters/Pancho.png'
+            image: 'assets/images/characters/Pancho.png',
+            playable: true
         },
         'Sebastian': { 
             name: 'Sebastián', alias: 'Seba', description: "Seba: El Apasionado por lo Retro.", 
-            inventories: [], 
+            inventory: [], 
             x: 250, y: 150, width: 130, height: 200, 
-            image: 'assets/images/characters/Seba.png'
+            image: 'assets/images/characters/Seba.png',
+            playable: true
         },
-        'Juan': { name: 'Juan', alias: 'Juan', description: "Juan: El Jugador.", x: 350, y: 230, width: 26, height: 80, skinColor: '#E0AC69', shirtColor: '#8B0000', pantsColor: '#222', hairColor: '#252525' },
+        'Juan': { name: 'Juan', alias: 'Juan', description: "Juan: El Jugador.", 
+            inventory: [],
+            x: 350, y: 230, width: 26, height: 80, skinColor: '#E0AC69', shirtColor: '#8B0000', pantsColor: '#222', hairColor: '#252525',
+            playable: false
+         },
         'JuanMa': { 
             name: 'Juan Manuel', alias: 'JuanMa', description: "JuanMa: El DJ.", 
-            inventories: [], 
+            inventory: [], 
             x: 450, y: 150, width: 60, height: 90, skinColor: '#FFDAB9', shirtColor: '#1E90FF', pantsColor: '#555', hairColor: '#4A4A4A',
-            onGrab: "Eso se lo dejo al Rata"
+            playable: false
         },
         'Bocha': { name: 'Darío', alias: 'El Bocha', description: "El Bocha: El Ausente.", 
-            inventories: [], 
+            inventory: [], 
             x: 400, y: 150, width: 130, height: 200, 
-            image: 'assets/images/characters/Bocha.png' },
+            image: 'assets/images/characters/Bocha.png',
+            playable: false },
         'Ale': { 
             name: 'Alejandro', alias: 'Ale', description: "Ale: El Analista Político.", 
-            inventories: [], 
+            inventory: [], 
             x: 600, y: 150, width: 130, height: 220, 
-            image: 'assets/images/characters/Ale.png'
+            image: 'assets/images/characters/Ale.png',
+            playable: false
         },
         'Federico': {
             name: 'Federico', alias: 'Fede', description: "Fede: El Proveedor.",
-            inventories: [], 
-            x: 480, y: 225, width: 24, height: 82, skinColor: '#F5DEB3', shirtColor: '#DC143C', pantsColor: '#333', hairColor: '#654321'
+            inventory: [], 
+            x: 480, y: 225, width: 24, height: 82, skinColor: '#F5DEB3', shirtColor: '#DC143C', pantsColor: '#333', hairColor: '#654321',
+            playable: false
         },
         'Rata': {
             name: 'El Rata', alias: 'Rata', description: "Rata: El Asador Designado.",
-            inventories: [], 
+            inventory: [], 
             x: 680, y: 150, width: 130, height: 200, 
-            image: 'assets/images/characters/Rata.png'
+            image: 'assets/images/characters/Rata.png',
+            playable: false
         },
         'Pelu': { 
             name: 'Sebastián', alias: 'El Pelu', description: "El Pelu: El Revolucionario.", 
-            inventories: [], 
-            x: 200, y: 235, width: 26, height: 78, skinColor: '#F5DEB3', shirtColor: '#FFD700', pantsColor: '#222', hairColor: '#1C1C1C'
+            inventory: [], 
+            x: 200, y: 235, width: 26, height: 78, skinColor: '#F5DEB3', shirtColor: '#FFD700', pantsColor: '#222', hairColor: '#1C1C1C',
+            playable: false
         },
         'Locura': {
             name: 'Martín', alias: 'El Locura', description: "El Locura: El Picador Serial.",
-            inventories: [], 
-            x: 300, y: 210, width: 26, height: 86, skinColor: '#FFE4C4', shirtColor: '#B0C4DE', pantsColor: '#36454F', hairColor: '#F5F5DC'
+            inventory: [], 
+            x: 300, y: 210, width: 26, height: 86, skinColor: '#FFE4C4', shirtColor: '#B0C4DE', pantsColor: '#36454F', hairColor: '#F5F5DC',
+            playable: false
         },
         'Pol': { 
             name: 'Pablo', alias: 'Pol', description: "Pol: El Ahorrativo.", 
-            inventories: [], 
-            x: 50, y: 230, width: 24, height: 80, skinColor: '#F5DEB3', shirtColor: '#808000', pantsColor: '#708090', hairColor: '#A0522D'
+            inventory: [], 
+            x: 50, y: 230, width: 24, height: 80, skinColor: '#F5DEB3', shirtColor: '#808000', pantsColor: '#708090', hairColor: '#A0522D',
+            playable: false
         },
         'Muñeco': { 
             name: 'Agustín', alias: 'El Muñeco', description: "El Muñeco: El Deportista.", 
-            inventories: ['encendedor'], 
+            inventory: ['encendedor'], 
             x: 550, y: 150, width: 130, height: 180, 
-            image: 'assets/images/characters/El Muñeco.png'
+            image: 'assets/images/characters/El Muñeco.png', 
+            playable: false
         },
         'Juanjo': { 
             name: 'Juanjo', alias: 'J', description: "Vive en Italia. Se conecta por videollamada. Alto, morocho, pelo enrulado.", 
-            inventories: [], 
-            x: -1000, y: -1000, width: 28, height: 95, skinColor: '#E0AC69', shirtColor: '#556B2F', pantsColor: '#463321', hairColor: '#4F2A15'
+            inventory: [], 
+            x: -1000, y: -1000, width: 28, height: 95, skinColor: '#E0AC69', shirtColor: '#556B2F', pantsColor: '#463321', hairColor: '#4F2A15',
+            playable: false
         }
     },
 

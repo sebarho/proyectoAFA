@@ -13,6 +13,11 @@ export const state = {
     lastInteractionTime: Date.now(),
 }; 
 
+export const globals = {
+    debugMode: false,
+};
+
+
 export function getGameState() {
     console.log("Estado del juego:", state.actionState.item);
     return state;
