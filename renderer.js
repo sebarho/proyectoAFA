@@ -1,4 +1,4 @@
-import { state as gameState, globals } from "./runtime.js";
+import { gameState, getVerbConfig, globals } from "./engine.js";
 import { gameData } from "./data.js";
 
 let imageAssets = {};
@@ -184,6 +184,7 @@ function printDebugInfo(ui) {
         text = (gameState.inventories == null) ? "Null" : gameState.inventories;
         ui.ctx.fillText("Inventories: ..... " + gameState.inventories, 0, line * sep); line++;
         ui.ctx.fillText("Last Inter.  Time: " + gameState.lastInteractionTime, 0, line * sep); line++;
+        ui.ctx.fillText("VerbConfig: ...... " + getVerbConfig(), 0, line * sep); line++;
     }
 }
 

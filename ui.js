@@ -1,12 +1,17 @@
-import { state as gameState, state } from "./runtime.js";
-import { gameData } from "./data.js";
-import {parseAction} from "./game.js";
-
+import {
+    gameState,
+    getVerbConfig,
+    parseAction,
+    getGameData,
+    getItemData,
+    handleClick,
+    globals,
+    handleVerbClick,
+} from "./engine.js";
 
 export const uiOptions = {
-    dialogueSpeed: 100 // milliseconds per character
+    dialogueSpeed: 60 // milliseconds per character
 };
-
 
 export const ui = {
     document: null,
@@ -22,35 +27,44 @@ export const ui = {
     ctx: null    // EL contexto 2D del canvas
 };
 
-let verbConfig = [];
-
 let speaking = false;
 
 const dialogueQueue = [];
 
 let dialogueActive = false;
 
-//////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////
-//////////
-//////////    S U P P O R T    F U N C T I O N S
-//////////
-//////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////
+export function initUI() {
+    console.log("Intializing User Interface...")
+    // Get the UI objects
+    ui.document = document;
+    ui.actionContainer = document.getElementById('action-container');
+    ui.actionBox = document.getElementById('action-box');
+    ui.actionText = document.getElementById('action-text');
+    ui.verbBar = document.getElementById('verb-bar');
+    ui.dialogueText = document.getElementById('dialogue-text');
+    ui.dialogueContainer = document.getElementById('dialogue-container');
+    ui.characterSwitcher = document.getElementById('character-switcher');
+    ui.inventoryBox = document.getElementById('inventory-box');
+    ui.canvas = document.getElementById('game-canvas');
+    ui.ctx = ui.canvas.getContext('2d');
+    console.log(' - UI objects created.');
 
-function getItemData(itemName, gameData) {
-    /// Helper function to find an item's data
-    if (gameData.items[itemName]) {
-        return gameData.items[itemName];
-    }
-    // If not found in any scene, it might be a dynamically added item or an error
-    // We can return a default object or null
-    return { name: itemName.replace(/_/g, ' ') };
-    // return null
+    //Registra los eventos de mouse en el canvas en el Event Loop
+    ui.document.addEventListener('keydown', handleKeyPress);
+    ui.canvas.addEventListener('mouseleave', handleCanvasMouseLeave);
+    ui.canvas.addEventListener('mousemove', handleCanvasMousemove);
+    ui.canvas.addEventListener('click', handleCanvasClick);
+    document.querySelectorAll('.verb-button').forEach(b => b.addEventListener('click', () => handleVerbClick(b.textContent)));
+    console.log('game.js: Event listeners registered.');
+
+    //Carga los controles de personajes e inventario
+    setupCharacterSwitcher();
+    console.log(' - Character switcher set up.');
+
+    //updateInventoryView(ui);
+    console.log('game.js: Game initialized successfully. Starting game loop.');
 }
 
-
-//////////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
@@ -60,21 +74,13 @@ function getItemData(itemName, gameData) {
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
 
-export function configureVerbs (vc){
-    verbConfig = null;
-    verbConfig = vc;
-}
-
-export function getVerbConfig(){
-    return verbConfig;
-}
-export function createVerbButtons(vc) {
+export function createVerbButtons() {
     /**
-     * Creates the verb buttons according to the data in `vc`
+     * Creates the verb buttons according to the data in gameData.verbs[] (defined in data.js)
     */
 
-    verbConfig = vc; // Store verb configuration globally
-
+    const verbConfig = getVerbConfig(); // Store verb configuration globally
+    console.log(verbConfig);
     const verbBar = document.getElementById('verb-bar');
     verbBar.innerHTML = ''; // Clear existing buttons
 
@@ -105,12 +111,12 @@ export function setupCharacterSwitcher() {
 
     //Cleans the character switcher
     ui.characterSwitcher.innerHTML = ""
-    
+
     // Create a title
     //ui.characterSwitcher.innerHTML = '<h3>Amigos:</h3>';
 
     // Now, creates a button per playable character (actor)
-    Object.entries(gameData.characters).forEach(([key, char]) => {
+    Object.entries(getGameData().characters).forEach(([key, char]) => {
         if (char.playable) {
             if (char.x < 0) return;
 
@@ -124,14 +130,13 @@ export function setupCharacterSwitcher() {
                 document.querySelectorAll('.character-avatar').forEach(a => a.classList.remove('active'));
                 avatar.classList.add('active');
                 // Buscar la escena donde está el personaje
-                for (const [sceneKey, scene] of Object.entries(gameData.scenes)) {
+                for (const [sceneKey, scene] of Object.entries(getGameData().scenes)) {
                     if (scene.characters.includes(key)) {
                         gameState.currentScene = sceneKey;
                         break;
                     }
                 }
                 updateInventoryView(ui);
-                //fullRedraw(); 
             });
 
             if (key === gameState.currentPlayer) avatar.classList.add('active');
@@ -185,7 +190,7 @@ export function updateInventoryView() {
     list.id = 'inventory-list';
 
     const currentPlayer = gameState.currentPlayer;
-    const characterData = gameData.characters[currentPlayer];
+    const characterData = getGameData().characters[currentPlayer];
 
     // Validación defensiva
     if (!characterData || !Array.isArray(characterData.inventory)) {
@@ -211,7 +216,7 @@ export function updateInventoryView() {
             const itemEl = document.createElement('li');
             itemEl.className = 'inventory-item';
 
-            const itemData = getItemData(itemName, gameData);
+            const itemData = getItemData(itemName);
             itemEl.textContent = itemData ? itemData.name : itemName.replace(/_/g, ' ');
 
             // Marca el ítem como activo si corresponde
@@ -221,7 +226,7 @@ export function updateInventoryView() {
             // Al hacer clic, se activa o desactiva el ítem
             // TODO: EN vez de activar o desactivar el item, deberia agregarse a 'actionState'
             itemEl.onclick = () => {
-                
+
                 //gameState.activeItem = (gameState.activeItem === itemName) ? null : itemName;
                 //updateInventoryView();
                 if (gameState.dialogue && gameState.dialogue.active) {
@@ -229,7 +234,7 @@ export function updateInventoryView() {
                 } else {
                     handleClick();
                 }
-                
+
                 updateActionText();   // Ahora refresca el texto de acción
             };
 
@@ -243,7 +248,7 @@ export function updateInventoryView() {
                 gameState.hoverTarget = null;
                 updateActionText();
             };
-            
+
             list.appendChild(itemEl);
         });
     }
@@ -275,7 +280,7 @@ export function startDialogue(speakerName, listenerName, nodeKey) {
      * Establishes a dialogue session between two characters.
      */
 
-    let conversation = gameData.dialogueMatrix[listenerName];
+    let conversation = getGameData().dialogueMatrix[listenerName];
 
     gameState.dialogue = {
         active: true,
@@ -345,7 +350,7 @@ export function selectDialogueOption(option) {
 
     // Display NPC response
     //ui.dialogueText.textContent = `${gameData.characters[listener].alias}: ${option.npc}`;  // Shows the selected dialogue
-    showDialogueLine(`${gameData.characters[listener].alias}: ${option.npc}`);  // Shows the selected dialogue
+    showDialogueLine(`${getGameData().characters[listener].alias}: ${option.npc}`);  // Shows the selected dialogue
     ui.dialogueContainer.innerHTML = ''; // Clear options
 
     //TODO: Borrar esto?
@@ -356,16 +361,16 @@ export function selectDialogueOption(option) {
     //TODO: Revisar este sistema de incluir dar un objeto 
     // quizas estaria bueno pensar en invisibilizar opciones del mismo modo
     if (option.givesItem) {
-        const itemIndex = gameData.characters[listener].inventory.indexOf(option.givesItem);
+        const itemIndex = getGameData.characters[listener].inventory.indexOf(option.givesItem);
         if (itemIndex > -1) {
-            gameData.characters[listener].inventory.splice(itemIndex, 1);
-            gameData.characters[speaker].inventory.push(option.givesItem);
+            getGameData().characters[listener].inventory.splice(itemIndex, 1);
+            getGameData().characters[speaker].inventory.push(option.givesItem);
             updateInventoryView();
         }
     }
 
     const nextNodeKey = option.leadsTo;
-    
+
     // se muestra la respuesta del NPC
     updateDialogueView();
     // vacia las opciones. (al terminar la respuesta del NPC se se volvera a ejecutar nuevas funciones o no, 
@@ -392,7 +397,7 @@ function endDialogue() {
     ui.characterSwitcher.style.display = 'block';
     ui.inventoryBox.style.display = 'block';
     ui.dialogueContainer.style.display = 'none';
-    state.dialogue = null;
+    gameState.dialogue = null;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -433,8 +438,8 @@ function showNextDialogueLine() {
     } else {
         console.log("No more dialogue lines to show.");
         ui.dialogueText.textContent = '';
-        if (state.dialogue) {
-            if (state.dialogue.active){
+        if (gameState.dialogue) {
+            if (gameState.dialogue.active) {
                 updateDialogueView(); //Muestra las nuevas opciones de respuesta si hay
             }
         }
@@ -453,14 +458,14 @@ export function updateActionText() {
     if (gameState.dialogue && gameState.dialogue.active) return;
 
     const verbKey = gameState.actionState?.verb;
-    const verbData = verbKey ? verbConfig[verbKey] : null;
+    const verbData = verbKey ? getVerbConfig()[verbKey] : null;
 
     const getTargetName = () => {
         if (!gameState.hoverTarget) return null;
         const { type, key } = gameState.hoverTarget;
-        if (type === 'character') return gameData.characters[key].alias || gameData.characters[key].name;
-        if (type === 'item') return gameData.items[key].name;
-        if (type === 'object') return gameData.objects[key].name;
+        if (type === 'character') return getGameData().characters[key].alias || getGameData().characters[key].name;
+        if (type === 'item') return getGameData().items[key].name;
+        if (type === 'object') return getGameData().objects[key].name;
         return null;
     };
 
@@ -473,7 +478,7 @@ export function updateActionText() {
         let itemText = '';
 
         if (gameState.activeItem) {
-            const itemData = getItemData(gameState.activeItem, gameData);
+            const itemData = getItemData(gameState.activeItem);
             itemText = itemData ? itemData.name : gameState.activeItem.replace(/_/g, ' ');
         }
 
@@ -485,18 +490,18 @@ export function updateActionText() {
     //  Caso 2: no hay verbo, pero hay ítem activo 
     //TODO: El verbo debera comportarse como hoover mas adelante asi que puede que esto deba ser eliminado
     else if (gameState.activeItem) {
-        const itemData = getItemData(gameState.activeItem, gameData);
+        const itemData = getItemData(gameState.activeItem);
         finalText = itemData ? itemData.name : gameState.activeItem.replace(/_/g, ' ');
     }
     //  Caso 3: no hay verbo ni ítem, pero hay algo hover
     else if (targetName) {
         finalText = targetName;
     }
-    
-    if(ui.actionText){
-        ui.actionText.textContent = (finalText=="") ? "" : finalText.trim();
+
+    if (ui.actionText) {
+        ui.actionText.textContent = (finalText == "") ? "" : finalText.trim();
     } else {
-        console.warn("⚠️action-text no encontrado al intentar poner: '", finalText,"'"); 
+        console.warn("⚠️action-text no encontrado al intentar poner: '", finalText, "'");
         //TODO: This line and the IF ELSE structure is to workaround an error I had.. 
         // delete when all is ok, since its not necesary if all is working ok
     }
@@ -504,16 +509,47 @@ export function updateActionText() {
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-function handleClick() {
-console.log('----8<-----------------------------8<----')
-    state.lastInteractionTime = Date.now();
-    if (state.dialogue && state.dialogue.active) return;
-    const target = state.hoverTarget;
-    const verb = state.actionState.verb;
+//////////////////////////////////////////////////////////////////////////////////////
+///
+///    E V E N T S   H A N D L E R S
+///
+//////////////////////////////////////////////////////////////////////////////////////
+
+function handleKeyPress(e) {
+    console.log("Key pressed");
+    if (e.ctrlKey && e.key === 'd') {
+        e.preventDefault(); // Evita que el navegador guarde la página
+        //SWITCH DEBUG MODE
+        if (globals.debugMode) {
+            globals.debugMode = false;
+        } else {
+            globals.debugMode = true;
+        }
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+///
+///    CLICK HANDLE FUNCTIONS
+///
+//////////////////////////////////////////////////////////////////////////////////////
+
+function handleDefaultClick() {
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+function handleCanvasClick(event) {
+
+    console.log('----8<-----------------------------8<----')
+    gameState.lastInteractionTime = Date.now();
+    if (gameState.dialogue && gameState.dialogue.active) return;
+    const target = gameState.hoverTarget;
+    const verb = gameState.actionState.verb;
 
     if (!verb) {
         console.log('No hay verbo seleccionado');
-        //handleDefaultClick(target, ui);
+        handleDefaultClick(target, ui);
         return;
     }
 
@@ -523,7 +559,7 @@ console.log('----8<-----------------------------8<----')
         return;
     }
     // Selección del primer argumento (puede ser item, object o character según el verbo)
-    if (!state.actionState.item.key && !state.actionState.target.key) {
+    if (!gameState.actionState.item.key && !gameState.actionState.target.key) {
         // ¿Qué tipos acepta el verbo como primer argumento?
         let firstExpected = config.expects[0];
         // Si es un array (varios tipos posibles)
@@ -533,11 +569,11 @@ console.log('----8<-----------------------------8<----')
                     console.log('Primer argumento válido: [' + target.type + '] ' + target.key);
                     // Guarda el argumento en el campo correcto
                     if (target.type === 'item') {
-                        state.actionState.item.key = target.key;
-                        state.actionState.item.type = target.type;
+                        gameState.actionState.item.key = target.key;
+                        gameState.actionState.item.type = target.type;
                     } else {
-                        state.actionState.target.key = target.key;
-                        state.actionState.target.type = target.type;
+                        gameState.actionState.target.key = target.key;
+                        gameState.actionState.target.type = target.type;
                     }
                     updateActionText(ui, getVerbConfig());
 
@@ -555,11 +591,11 @@ console.log('----8<-----------------------------8<----')
             if (target.type === firstExpected) {
                 console.log('Primer argumento válido:', target.type, target.key);
                 if (target.type === 'item') {
-                    state.actionState.item.key = item.key;
-                    state.actionState.item.type = item.type;
+                    gameState.actionState.item.key = item.key;
+                    gameState.actionState.item.type = item.type;
                 } else {
-                    state.actionState.target.key = target.key;
-                    state.actionState.target.type = target.type;
+                    gameState.actionState.target.key = target.key;
+                    gameState.actionState.target.type = target.type;
                 }
                 updateActionText(getVerbConfig());
 
@@ -575,19 +611,19 @@ console.log('----8<-----------------------------8<----')
     }
 
     // Selección del segundo objeto/target si es necesario u opcional
-    if (state.actionState.item && !state.actionState.target) {
+    if (gameState.actionState.item && !gameState.actionState.target) {
         // Si el verbo permite un segundo objeto opcional
         if (config.optional && config.optional.includes(target.type)) {
             console.log('Segundo argumento opcional válido:', target.type, target.key);
-            state.actionState.target.key = target.key;
-            state.actionState.target.type = target.type;
+            gameState.actionState.target.key = target.key;
+            gameState.actionState.target.type = target.type;
             parseAction()
         }
         // Si el verbo requiere un target específico
         if (config.expects[1] && target.type === config.expects[1]) {
             console.log('Segundo argumento requerido válido:', target.type, target.key);
-            state.actionState.target.key = target.key;
-            state.actionState.target.type = target.type;
+            gameState.actionState.target.key = target.key;
+            gameState.actionState.target.type = target.type;
             parseAction();
             return;
         }
@@ -599,4 +635,54 @@ console.log('----8<-----------------------------8<----')
         }
         console.log('Segundo argumento NO válido:', target?.type, target?.key);
     }
+}
+//////////////////////////////////////////////////////////////////////////////////////
+
+function handleCanvasMousemove(event) {
+    if (gameState.dialogue && gameState.dialogue.active) return;
+    const rect = ui.canvas.getBoundingClientRect();
+    gameState.hoverTarget = getTargetAt(event.clientX - rect.left, event.clientY - rect.top);
+    updateActionText();//verbConfig);
+    //ui.fullRedraw();
+}
+
+function handleCanvasMouseLeave(event) {
+    gameState.hoverTarget = null;
+    updateActionText();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+function getTargetAt(x, y) {
+    /**
+     * Determina qué elemento del escenario (objeto, item o personaje) está bajo las coordenadas (x, y).
+     * Devuelve un objeto con { key, data, type } si encuentra un target, o null si no hay nada en esa posición.
+     */
+
+    // Obtiene la escena actual según el estado del juego
+    const scene = getGameData().scenes[gameState.currentScene];
+
+    // Crea una lista de todos los posibles targets en la escena:
+    // - Objetos del escenario (type: 'object')
+    // - Items visibles (type: 'item')
+    // - Personajes presentes (type: 'character')
+    const allTargets = [
+        // Items que no están ocultos
+        ...scene.items.filter(itemKey => !getGameData().items[itemKey].isHidden).map(itemKey => ({ key: itemKey, data: getGameData().items[itemKey], type: 'item' })),
+        // Objetos del escenario
+        ...scene.objects.map(objectKey => ({ key: objectKey, data: getGameData().objects[objectKey], type: 'object' })),
+        // Personajes en la escena
+        ...scene.characters.map(charKey => ({ key: charKey, data: getGameData().characters[charKey], type: 'character' }))
+    ]
+        // Ordena los targets por su posición vertical (y + height), para que los que están "más adelante" tengan prioridad
+        .sort((a, b) => (a.data.y + (a.data.height || 0)) - (b.data.y + (b.data.height || 0)));
+
+    // Recorre todos los targets y verifica si las coordenadas (x, y) están dentro de su área
+    for (const target of allTargets) {
+        const d = target.data;
+        if (x >= d.x && x <= d.x + d.width && y >= d.y && y <= d.y + d.height) {
+            return target; // Devuelve el primer target que contiene el punto (x, y)
+        }
+    }
+    // Si no se encontró ningún target bajo el mouse, devuelve null
+    return null;
 }

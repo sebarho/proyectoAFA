@@ -4,14 +4,24 @@
 ///
 //////////////////////////////////////////////////////////////////////////////////////
 
-import { runActionScript } from './game.js';
-import { state } from './runtime.js';
+//import { runActionScript } from './game.js';
+import { gameState,
+    runActionScript
+ } from './engine.js';
 import { gameData} from './data.js';
 import { drawScene } from './renderer.js';
 import { startDialogue as startDial, showDialogueLine, updateInventoryView, uiOptions,
     setupCharacterSwitcher
 } from './ui.js';
 
+/////////////////////////////////////////////////////////////////////////////////////
+
+export function getGameState() {
+    /**
+     * Presented as a function to encapsulate it
+     */
+    return gameState
+}
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function addPlayer (name) {
@@ -34,12 +44,6 @@ export function removePlayer(name) {
         gameData.characters[name].playable = false;
         setupCharacterSwitcher;
     }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////
-
-export function gameState() {
-    return state;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -68,14 +72,14 @@ export function actorChangeScene(actor, destination) {
    console.log("Cambiando la escena de '" + actor + "' a:" + destination);
    //console.log(gameData.scenes.includes(destination) + "--" + gameData.characters.includes(actor))
    const { scenes, characters } = gameData;
-   const from = state.currentScene;
+   const from = gameState.currentScene;
    //if (scenes.includes(destination) && characters.includes(actor)) {
     scenes[from].characters = scenes[from].characters.filter(c => c !== actor);
     scenes[destination].characters.push(actor);
     //}
     //Si el actor es el jugador actual, cambia la escena
-    if (actor === state.currentPlayer) {
-        state.currentScene = destination;
+    if (actor === gameState.currentPlayer) {
+        gameState.currentScene = destination;
     }
 }
 
@@ -103,7 +107,7 @@ export function addItemToActor(characterName, itemName) {
     }
 
     // Si el personaje activo es el que recibe el ítem, actualiza la vista
-    if (state.currentPlayer === characterName) {
+    if (gameState.currentPlayer === characterName) {
         updateInventoryView();
     }
 }
@@ -121,7 +125,7 @@ export function removeItemFromActor(characterName, itemName) {
         console.log(`removeItemFromCharacter: Se quitó "${itemName}" del inventario de "${characterName}".`);
     }
     
-    if (sate.currentPlayer === characterName) {
+    if (gameState.currentPlayer === characterName) {
         updateInventoryView();
     }
 }
@@ -129,7 +133,7 @@ export function removeItemFromActor(characterName, itemName) {
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function startDialogue(listener, nodeID) {
-   const speaker = state.currentPlayer;
+   const speaker = gameState.currentPlayer;
    
    if (!speaker || !listener) {
        console.warn(`startDialogue: No se pudo iniciar el diálogo.`);
@@ -232,7 +236,7 @@ export function getItem(itemName) {
     /**
      * El jugador actual recoge un ítem del escenario.
      */
-    const scene = gameData.scenes[state.currentScene];
+    const scene = gameData.scenes[gameState.currentScene];
     const itemIndex = scene.items.indexOf(itemName);
     if (itemIndex === -1) {
         console.warn(`getItem: El ítem "${itemName}" no está en la escena actual.`);
@@ -240,7 +244,7 @@ export function getItem(itemName) {
     }
     scene.items.splice(itemIndex, 1);
     console.log(`getItem: El ítem "${itemName}" ha sido recogido.`);
-    addItemToActor(state.currentPlayer, itemName);
+    addItemToActor(gameState.currentPlayer, itemName);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -249,7 +253,7 @@ export function dropItem(itemName) {
     /**
      * 
      */
-    const character = gameData.characters[state.currentPlayer];
+    const character = gameData.characters[gameState.currentPlayer];
     if (!character || !Array.isArray(character.inventories)) {
         console.warn(`dropItem: El personaje "${state.currentPlayer}" no tiene inventario.`);
         return;
@@ -261,7 +265,7 @@ export function dropItem(itemName) {
     }
     character.inventories.splice(itemIndex, 1);
     console.log(`dropItem: El ítem "${itemName}" ha sido soltado.`);
-    const scene = gameData.scenes[state.currentScene];
+    const scene = gameData.scenes[gameState.currentScene];
     scene.items.push(itemName);
 }
 
