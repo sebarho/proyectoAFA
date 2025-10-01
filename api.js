@@ -5,26 +5,35 @@
 //////////////////////////////////////////////////////////////////////////////////////
 
 //import { runActionScript } from './game.js';
-import { gameState,
+import {
+    gameState,
+    gameData,
     runActionScript
- } from './engine.js';
-import { gameData} from './data.js';
+} from './engine.js';
 import { drawScene } from './renderer.js';
-import { startDialogue as startDial, showDialogueLine, updateInventoryView, uiOptions,
+import {
+    startDialogue as startDial, showDialogueLine, updateInventoryView, uiOptions,
     setupCharacterSwitcher
 } from './ui.js';
-
 /////////////////////////////////////////////////////////////////////////////////////
+
+export function getGameData() {
+    /**
+     * Presented as a function to encapsulate it
+     */
+    return gameData;
+}
+//////////////////////////////////////////////////////////////////////////////////////
 
 export function getGameState() {
     /**
      * Presented as a function to encapsulate it
      */
-    return gameState
+    return gameState;
 }
 //////////////////////////////////////////////////////////////////////////////////////
 
-export function addPlayer (name) {
+export function addPlayer(name) {
     /**
      * Makes a character playable and updates de character switcher
      */
@@ -33,7 +42,6 @@ export function addPlayer (name) {
         setupCharacterSwitcher;
     }
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function removePlayer(name) {
@@ -45,14 +53,12 @@ export function removePlayer(name) {
         setupCharacterSwitcher;
     }
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function runScript(name) {
     //Ejecutamos el script:
-    return runActionScript(name)
+    return runActionScript(name);
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function say(what) {
@@ -63,17 +69,17 @@ export function say(what) {
     showDialogueLine(what);
     //setTimeout(() => { if (dialogueText) dialogueText.textContent = '' }, textSpeed);
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
+
 export function actorChangeScene(actor, destination) {
     /**
      * Cambia el actor de una escena a otra.
     */
-   console.log("Cambiando la escena de '" + actor + "' a:" + destination);
-   //console.log(gameData.scenes.includes(destination) + "--" + gameData.characters.includes(actor))
-   const { scenes, characters } = gameData;
-   const from = gameState.currentScene;
-   //if (scenes.includes(destination) && characters.includes(actor)) {
+    console.log("Cambiando la escena de '" + actor + "' a:" + destination);
+    //console.log(gameData.scenes.includes(destination) + "--" + gameData.characters.includes(actor))
+    const { scenes, characters } = gameData;
+    const from = gameState.currentScene;
+    //if (scenes.includes(destination) && characters.includes(actor)) {
     scenes[from].characters = scenes[from].characters.filter(c => c !== actor);
     scenes[destination].characters.push(actor);
     //}
@@ -82,7 +88,6 @@ export function actorChangeScene(actor, destination) {
         gameState.currentScene = destination;
     }
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function addItemToActor(characterName, itemName) {
@@ -111,42 +116,38 @@ export function addItemToActor(characterName, itemName) {
         updateInventoryView();
     }
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function removeItemFromActor(characterName, itemName) {
     const character = gameData.characters[characterName];
-    
+
     if (!character || !Array.isArray(character.inventory)) return;
-    
+
     const index = character.inventory.indexOf(itemName);
     if (index !== -1) {
         character.inventory.splice(index, 1);
         console.log(`removeItemFromCharacter: Se quitó "${itemName}" del inventario de "${characterName}".`);
     }
-    
+
     if (gameState.currentPlayer === characterName) {
         updateInventoryView();
     }
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function startDialogue(listener, nodeID) {
-   const speaker = gameState.currentPlayer;
-   
-   if (!speaker || !listener) {
-       console.warn(`startDialogue: No se pudo iniciar el diálogo.`);
-       return;
-   }
-   console.log(`startDialogue: Iniciando diálogo "${nodeID}" entre "${speaker.name}" y "${listener}".`);
-   startDial(speaker, listener, nodeID);
-}
+    const speaker = gameState.currentPlayer;
 
+    if (!speaker || !listener) {
+        console.warn(`startDialogue: No se pudo iniciar el diálogo.`);
+        return;
+    }
+    console.log(`startDialogue: Iniciando diálogo "${nodeID}" entre "${speaker.name}" y "${listener}".`);
+    startDial(speaker, listener, nodeID);
+}
 //////////////////////////////////////////////////////////////////////////////////////
 
-export function abortDaialogues(){}
-
+export function abortDaialogues() { }
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function getActor(characterName) {
@@ -159,7 +160,6 @@ export function getActor(characterName) {
     }
     return gameData.characters[characterName];
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function getItemData(itemName) {
@@ -171,8 +171,7 @@ export function getItemData(itemName) {
         return null;
     }
     return gameData.items[itemName];
-}   
-
+}
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function getObjectData(objectName) {
@@ -185,8 +184,7 @@ export function getObjectData(objectName) {
         return null;
     }
     return gameData.objects[objectName];
-}   
-    
+}
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function getSceneData(sceneName) {
@@ -198,8 +196,7 @@ export function getSceneData(sceneName) {
         return null;
     }
     return gameData.scenes[sceneName];
-}      
-
+}
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function moveItemToScene(itemName, sceneName) {
@@ -229,7 +226,6 @@ export function moveItemToScene(itemName, sceneName) {
         console.warn(`moveItemToScene: La escena "${sceneName}" no existe.`);
     }
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function getItem(itemName) {
@@ -246,7 +242,6 @@ export function getItem(itemName) {
     console.log(`getItem: El ítem "${itemName}" ha sido recogido.`);
     addItemToActor(gameState.currentPlayer, itemName);
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function dropItem(itemName) {
@@ -268,7 +263,6 @@ export function dropItem(itemName) {
     const scene = gameData.scenes[gameState.currentScene];
     scene.items.push(itemName);
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function showActor(characterName) {
@@ -289,7 +283,6 @@ export function showActor(characterName) {
         console.warn(`showActor: El personaje "${characterName}" no está en ninguna escena.`);
     }
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function setItemFlag(itemName, flag, value) {
@@ -304,7 +297,6 @@ export function setItemFlag(itemName, flag, value) {
     item.flags[flag] = value;
     console.log(`setItemFlag: La marca "${flag}" del ítem "${itemName}" ha sido establecida en "${value}".`);
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function canItemBePickedUp(itemName) {
@@ -318,7 +310,6 @@ export function canItemBePickedUp(itemName) {
     }
     return item.isPickable;
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function isItemHidden(itemName) {
@@ -332,7 +323,6 @@ export function isItemHidden(itemName) {
     }
     return !!item.isHidden;
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function isItemFlagSet(itemName, flag) {
@@ -350,7 +340,6 @@ export function isItemFlagSet(itemName, flag) {
     }
     return !!item.flags[flag];
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function toggleItemFlag(itemName, flag) {
@@ -369,10 +358,9 @@ export function toggleItemFlag(itemName, flag) {
     item.flags[flag] = !item.flags[flag];
     console.log(`toggleItemFlag: La marca "${flag}" del ítem "${itemName}" ha sido alternada a "${item.flags[flag]}".`);
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
-export function giveItemTo (itemName, characterName) {
+export function giveItemTo(itemName, characterName) {
     /**
      * El jugador actual le da un ítem a otro personaje.
      */
@@ -390,7 +378,6 @@ export function giveItemTo (itemName, characterName) {
     console.log(`giveItemTo: El ítem "${itemName}" ha sido dado a "${characterName}".`);
     addItemToActor(characterName, itemName);
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function setObjectState(objectName, state, value) {
@@ -409,7 +396,6 @@ export function setObjectState(objectName, state, value) {
         drawScene(ui);
     }
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function getObjectState(objectName, state) {
@@ -422,7 +408,6 @@ export function getObjectState(objectName, state) {
     }
     return gameData.objects[objectName][state];
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function actorHasItem(characterName, itemName) {
@@ -440,7 +425,6 @@ export function actorHasItem(characterName, itemName) {
     }
     return character.inventories.includes(itemName);
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function isObjectInState(objectName, state, value) {
@@ -453,7 +437,6 @@ export function isObjectInState(objectName, state, value) {
     }
     return gameData.objects[objectName][state] === value;
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function changeActor(characterName, ui) {
@@ -468,9 +451,8 @@ export function changeActor(characterName, ui) {
     console.log(`changePlayer: El personaje jugador actual es ahora "${characterName}".`);
     updateInventoryView(ui);
     // Si el nuevo jugador no está en la escena actual, lo movemos allí
-   showActor(characterName);
+    showActor(characterName);
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function changeScene(sceneName) {
@@ -485,19 +467,16 @@ export function changeScene(sceneName) {
     console.log(`changeScene: La escena actual es ahora "${sceneName}".`);
     drawScene(ui);
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function getCurrentPlayer() {
     return state.currentPlayer;
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function getCurrentScene() {
     return state.currentScene;
-    }
-
+}
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function getInventory(characterName) {
@@ -510,7 +489,6 @@ export function getInventory(characterName) {
     }
     return gameData.characters[characterName].inventories || [];
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function hideUI() {
@@ -523,7 +501,6 @@ export function hideUI() {
     ui.actionText.style.display = 'none';
     ui.dialogueOptionsContainer.style.display = 'none';
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -537,7 +514,6 @@ export function showUI() {
     ui.actionText.style.display = 'block';
     ui.dialogueOptionsContainer.style.display = 'block';
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function wait(frames) {
@@ -556,7 +532,6 @@ export function wait(frames) {
         }, 1000 / 60);
     });
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function setTimer(callback, milliseconds) {
@@ -565,7 +540,6 @@ export function setTimer(callback, milliseconds) {
      */
     return setTimeout(callback, milliseconds);
 }
-
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function clearTimer(timerID) {
@@ -574,5 +548,4 @@ export function clearTimer(timerID) {
      */
     //TODO: Implementar
 }
-
 //////////////////////////////////////////////////////////////////////////////////////

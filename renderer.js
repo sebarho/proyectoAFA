@@ -1,5 +1,8 @@
-import { gameState, getVerbConfig, globals } from "./engine.js";
-import { gameData } from "./data.js";
+import { gameData, 
+    gameState,
+    getVerbConfig,
+    globals 
+} from "./engine.js";
 
 let imageAssets = {};
 let imagesToLoad = 0;

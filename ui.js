@@ -34,7 +34,7 @@ const dialogueQueue = [];
 let dialogueActive = false;
 
 export function initUI() {
-    console.log("Intializing User Interface...")
+    console.log("Initializing User Interface...")
     // Get the UI objects
     ui.document = document;
     ui.actionContainer = document.getElementById('action-container');
@@ -53,7 +53,7 @@ export function initUI() {
     ui.document.addEventListener('keydown', handleKeyPress);
     ui.canvas.addEventListener('mouseleave', handleCanvasMouseLeave);
     ui.canvas.addEventListener('mousemove', handleCanvasMousemove);
-    ui.canvas.addEventListener('click', handleCanvasClick);
+    ui.canvas.addEventListener('click', handleClick); //handleCanvasClick);
     document.querySelectorAll('.verb-button').forEach(b => b.addEventListener('click', () => handleVerbClick(b.textContent)));
     console.log('game.js: Event listeners registered.');
 
@@ -62,7 +62,7 @@ export function initUI() {
     console.log(' - Character switcher set up.');
 
     //updateInventoryView(ui);
-    console.log('game.js: Game initialized successfully. Starting game loop.');
+    console.log('...Game initialized successfully.');
 }
 
 
@@ -347,16 +347,11 @@ export function selectDialogueOption(option) {
      */
     const { listener, speaker } = gameState.dialogue;
     const dialogueLong = 0;
-
+    console.log("Listener: " + listener + " Speaker: " + speaker);
     // Display NPC response
     //ui.dialogueText.textContent = `${gameData.characters[listener].alias}: ${option.npc}`;  // Shows the selected dialogue
     showDialogueLine(`${getGameData().characters[listener].alias}: ${option.npc}`);  // Shows the selected dialogue
     ui.dialogueContainer.innerHTML = ''; // Clear options
-
-    //TODO: Borrar esto?
-    // if (option.setsAfaLocation) {
-    //     gameState.afa.location = option.setsAfaLocation;
-    // }
 
     //TODO: Revisar este sistema de incluir dar un objeto 
     // quizas estaria bueno pensar en invisibilizar opciones del mismo modo
@@ -477,22 +472,26 @@ export function updateActionText() {
     if (verbData) {
         let itemText = '';
 
-        if (gameState.activeItem) {
-            const itemData = getItemData(gameState.activeItem);
-            itemText = itemData ? itemData.name : gameState.activeItem.replace(/_/g, ' ');
+        if (gameState.actionState.item.key !=null) {
+            const itemData = getItemData(gameState.actionState.item.key);
+            itemText = itemData ? itemData.name : gameState.actionState.item.key.replace(/_/g, ' ');
         }
 
         finalText = verbData.display;
-        if (itemText) finalText += ` ${itemText}`;
-        if (verbData.preposition) finalText += ` ${verbData.preposition}`;
+        if (itemText) {
+            finalText += ` ${itemText}`;
+            if (verbData.connector) finalText += ` ${verbData.connector}`;
+        } else {
+            if (verbData.preposition) finalText += ` ${verbData.preposition}`; //TODO: Configurar bien cuando son items combinables (2 objetos por oracion)
+        }
         finalText += ` ${targetName || '...'}`;
     }
     //  Caso 2: no hay verbo, pero hay ítem activo 
     //TODO: El verbo debera comportarse como hoover mas adelante asi que puede que esto deba ser eliminado
-    else if (gameState.activeItem) {
-        const itemData = getItemData(gameState.activeItem);
-        finalText = itemData ? itemData.name : gameState.activeItem.replace(/_/g, ' ');
-    }
+    ///else if (gameState.activeItem) {
+    ///    const itemData = getItemData(gameState.activeItem);
+    ///    finalText = itemData ? itemData.name : gameState.activeItem.replace(/_/g, ' ');
+    ///}
     //  Caso 3: no hay verbo ni ítem, pero hay algo hover
     else if (targetName) {
         finalText = targetName;
@@ -535,107 +534,9 @@ function handleKeyPress(e) {
 //////////////////////////////////////////////////////////////////////////////////////
 
 function handleDefaultClick() {
+    console.log("Default click fired");
 }
 
-//////////////////////////////////////////////////////////////////////////////////////
-
-function handleCanvasClick(event) {
-
-    console.log('----8<-----------------------------8<----')
-    gameState.lastInteractionTime = Date.now();
-    if (gameState.dialogue && gameState.dialogue.active) return;
-    const target = gameState.hoverTarget;
-    const verb = gameState.actionState.verb;
-
-    if (!verb) {
-        console.log('No hay verbo seleccionado');
-        handleDefaultClick(target, ui);
-        return;
-    }
-
-    const config = getVerbConfig()[verb];
-    if (!config) {
-        console.log('Verbo no configurado:', verb);
-        return;
-    }
-    // Selección del primer argumento (puede ser item, object o character según el verbo)
-    if (!gameState.actionState.item.key && !gameState.actionState.target.key) {
-        // ¿Qué tipos acepta el verbo como primer argumento?
-        let firstExpected = config.expects[0];
-        // Si es un array (varios tipos posibles)
-        if (Array.isArray(firstExpected)) {
-            if (target != null) {
-                if (firstExpected.includes(target.type)) {
-                    console.log('Primer argumento válido: [' + target.type + '] ' + target.key);
-                    // Guarda el argumento en el campo correcto
-                    if (target.type === 'item') {
-                        gameState.actionState.item.key = target.key;
-                        gameState.actionState.item.type = target.type;
-                    } else {
-                        gameState.actionState.target.key = target.key;
-                        gameState.actionState.target.type = target.type;
-                    }
-                    updateActionText(ui, getVerbConfig());
-
-                    // Si solo requiere un argumento, ejecuta la acción
-                    if (config.expects.length === 1 && !config.optional) {
-                        console.log('Ejecutando acción con un solo argumento');
-                        parseAction(ui);
-                    }
-                    return;
-                }
-                return
-            }
-        } else {
-            // Solo un tipo permitido
-            if (target.type === firstExpected) {
-                console.log('Primer argumento válido:', target.type, target.key);
-                if (target.type === 'item') {
-                    gameState.actionState.item.key = item.key;
-                    gameState.actionState.item.type = item.type;
-                } else {
-                    gameState.actionState.target.key = target.key;
-                    gameState.actionState.target.type = target.type;
-                }
-                updateActionText(getVerbConfig());
-
-                if (config.expects.length === 1 && !config.optional) {
-                    console.log('Ejecutando acción con un solo argumento');
-                    parseAction();
-                }
-                return;
-            }
-        }
-        console.log('Primer argumento NO válido:', target?.type, target?.key);
-
-    }
-
-    // Selección del segundo objeto/target si es necesario u opcional
-    if (gameState.actionState.item && !gameState.actionState.target) {
-        // Si el verbo permite un segundo objeto opcional
-        if (config.optional && config.optional.includes(target.type)) {
-            console.log('Segundo argumento opcional válido:', target.type, target.key);
-            gameState.actionState.target.key = target.key;
-            gameState.actionState.target.type = target.type;
-            parseAction()
-        }
-        // Si el verbo requiere un target específico
-        if (config.expects[1] && target.type === config.expects[1]) {
-            console.log('Segundo argumento requerido válido:', target.type, target.key);
-            gameState.actionState.target.key = target.key;
-            gameState.actionState.target.type = target.type;
-            parseAction();
-            return;
-        }
-        // Si no se requiere segundo objeto, ejecuta la acción
-        if (!config.expects[1]) {
-            console.log('Ejecutando acción con un solo argumento (sin segundo requerido)');
-            parseAction();
-            return;
-        }
-        console.log('Segundo argumento NO válido:', target?.type, target?.key);
-    }
-}
 //////////////////////////////////////////////////////////////////////////////////////
 
 function handleCanvasMousemove(event) {

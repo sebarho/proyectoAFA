@@ -13,7 +13,8 @@ import {
 
 import { gameState,
     configureVerbs,
-    getGameData
+    getGameData,
+    init as engineInit
 } from './engine.js';
 
 
@@ -73,8 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     console.log('game.js: DOMContentLoaded event fired. Starting game initialization.');
     gameInit();
-    //gameLoop();
-
 });
 
 
@@ -86,7 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function gameInit() {
 
-    configureVerbs();
+    // Inits the engine and the data structure
+    engineInit();
+
+    configureVerbs(); //TODO: Puede que esta estructura sea redundante...
 
     loadAssets(recolectarRutasDeImagen(), () => {
         console.log('game.js: Initializing game after assets loaded...');
@@ -105,6 +107,7 @@ function gameInit() {
         initUI();
 
         // Start the game loop after initialization
+        console.log(" Starting game loop.");
         requestAnimationFrame(gameLoop); 
     });
 };

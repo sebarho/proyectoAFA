@@ -316,6 +316,7 @@ pancho_usar_encendedor
 
 Los scripts pueden acceder a todo el universo definido en `gameData`, incluyendo:
 
+- `gameData.verbs`: información de los verbos y su configuración
 - `gameData.characters`: información de personajes
 - `gameData.objects`: estado y propiedades de objetos
 - `gameData.items`: ítems disponibles y sus flags (`canBePickedUp`, `isHidden`, etc.)

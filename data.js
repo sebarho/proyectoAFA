@@ -3,7 +3,7 @@
 
 import * as api from "./api.js";
 
-export const gameData = {
+export const storyData = {
     inits: {
         player: 'Pancho',
         scene: 'quincho'
@@ -13,7 +13,7 @@ export const gameData = {
         DAR: {
             label: 'Dar',
             display: 'Dar',
-            preposition: 'a',
+            connector: 'a',
             expects: ['item', 'character']
         },
         AGARRAR: {
@@ -24,9 +24,9 @@ export const gameData = {
         USAR: {
             label: 'Usar',
             display: 'Usar',
-            preposition: 'con',
+            connector: 'con',
             expects: [['item', 'object']],
-            optional: [['item', 'object']]
+            optional: ['item', 'object']
         },
         ABRIR: {
             label: 'Abrir',
@@ -135,7 +135,7 @@ export const gameData = {
             x: 50, y: 230, width: 24, height: 80, skinColor: '#F5DEB3', shirtColor: '#808000', pantsColor: '#708090', hairColor: '#A0522D',
             playable: false
         },
-        'Muñeco': {
+        'Agus': {
             name: 'Agustín', alias: 'El Muñeco', description: "El Muñeco: El Deportista.",
             inventory: ['encendedor'],
             x: 550, y: 150, width: 130, height: 180,
@@ -196,7 +196,7 @@ export const gameData = {
                 'mani',
                 'encendedor'
             ],
-            characters: ['Pancho', 'Sebastian', 'Bocha', 'Ale', 'Rata', 'Muñeco']
+            characters: ['Pancho', 'Sebastian', 'Bocha', 'Ale', 'Rata', 'Agus']
         },
         'patio': {
             name: 'Patio',
@@ -575,7 +575,7 @@ export const gameData = {
                 }
             ]
         },
-        'Muñeco': {
+        'Agus': {
             start: [
                 {
                     player: "Muñeco, ¿todo bien?",
@@ -700,13 +700,13 @@ export const storyScripts = {
                 break;
             }
             case "IR": {
-                if (gameData.objects[as.target.key].exits != null) {
-                    api.actorChangeScene(api.getGameState().currentPlayer, gameData.objects[as.target.key].exits);
+                if (api.getGameData().objects[as.item.key].exits != null) {
+                    api.actorChangeScene(api.getGameState().currentPlayer, api.getGameData().objects[as.item.key].exits);
                     break;
                 }
             }
             case "HABLAR": {
-                const characterKey = as.target.key;
+                const characterKey = as.item.key;
                 const nodeID = 'start';
                 api.startDialogue(characterKey, nodeID);
                 break;
@@ -716,24 +716,24 @@ export const storyScripts = {
                 break;
         }
     },
-    'usar_pala_jardin_en_heladera': () => {
-        const heladera = gameData.objects.heladera;
+    'usar_pala_jardin_heladera': () => {
+        const heladera = api.getGameData().objects.heladera;
         if (heladera.isStuck) {
             heladera.isStuck = false;
             heladera.isOpen = true;
-            gameData.scenes.cocina.items.carne.isHidden = false;
+            api.getGameData().items.carne.isHidden = false;
             return "Con un '¡clack!' metálico, la puerta de la heladera se abrió. ¡Ahí está la carne!";
         } else {
             return "No parece necesario usar la pala aquí.";
         }
     },
-    'usar_bolsa_carbon_en_parrilla': () => {
-        const parrilla = gameData.scenes.quincho.objects.parrilla;
+    'usar_bolsa_carbon_parrilla': () => {
+        const parrilla = api.getGameData().scenes.quincho.objects.parrilla;
         parrilla.hasCarbon = true;
         return "EL carbon ya esta puesto";
     },
-    'usar_encendedor_en_parrilla': () => {
-        const parrilla = gameData.objects.parrilla;
+    'usar_encendedor_parrilla': () => {
+        const parrilla = api.getGameData().objects.parrilla;
         if (parrilla.hasCarbon && !parrilla.isLit) {
             parrilla.isLit = true;
             return "¡Listo! Fuego prendido.";
@@ -745,8 +745,8 @@ export const storyScripts = {
             return "No funciona.";
         }
     },
-    'usar_carne_en_parrilla': () => {
-        const parrilla = gameData.objects.parrilla;
+    'usar_carne_parrilla': () => {
+        const parrilla = api.getGameData().objects.parrilla;
         if (api.getGameState().currentPlayer === 'Rata') {
             if (parrilla.isLit && api.getGameState().inventories[api.getGameState().currentPlayer].includes('carne')) {
                 return "¡A la parrilla! En un rato comemos.";
@@ -762,7 +762,7 @@ export const storyScripts = {
 
     'pancho_mirar_parrilla': () => {
         console.log("Ejecutando script: pancho_mirar_parrilla");
-        const parrilla = api.gameData.objects.parrilla;
+        const parrilla = api.api.getGameData().objects.parrilla;
         if (parrilla.isLit) {
             return "La parrilla está encendida y lista para usar.";
         } else {
@@ -777,13 +777,13 @@ export const storyScripts = {
 
     'generic_description': () => {
         if (api.getGameState().actionState.item.key != null) {
-            return gameData.items[api.getGameState().actionState.item.key].description;
+            return api.getGameData().items[api.getGameState().actionState.item.key].description;
         } else {
             switch (api.getGameState().actionState.target.type) {
                 case 'object':
-                    return gameData.objects[api.getGameState().actionState.target.key].description;
+                    return api.getGameData().objects[api.getGameState().actionState.target.key].description;
                 case 'character':
-                    return gameData.characters[api.getGameState().actionState.target.key].description;
+                    return api.getGameData().characters[api.getGameState().actionState.target.key].description;
                 default:
                     return "No puedo describir eso.";
             }
