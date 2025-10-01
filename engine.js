@@ -42,6 +42,8 @@ export const gameState = {
 
 export const globals = {
     debugMode: false,
+    engineVersion: '0.8.0',
+    engineName: "AFAengine",
 };
 
 //////////////////////////////////////////////////////////////////////////////////////

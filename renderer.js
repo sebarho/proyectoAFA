@@ -165,7 +165,9 @@ function printDebugInfo(ui) {
         ui.ctx.textAlign = 'left';
         const sep = 12;
         let line = 1;
-        let text = "";
+        let text = ""; 
+        ui.ctx.fillText(globals.engineName+ " - v" + globals.engineVersion, 0, line * sep); line++; 
+        ui.ctx.fillText("----------------------------------------", 0, line * sep); line++;
         ui.ctx.fillText("Current scene: ... " + gameState.currentScene, 0, line * sep); line++;
         ui.ctx.fillText("Current Player: .. " + gameState.currentPlayer, 0, line * sep); line++;
         ui.ctx.fillText("Action state verb: " + gameState.actionState.verb, 0, line * sep); line++;
