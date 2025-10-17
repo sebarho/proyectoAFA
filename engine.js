@@ -42,9 +42,15 @@ export const gameState = {
 
 export const globals = {
     debugMode: false,
-    engineVersion: '0.8.0',
+    engineVersion: '0.8.1 - Touch support',
     engineName: "AFAengine",
 };
+
+const scriptSlots = {
+    pc: 0, // Program counter
+    flags: [],
+    script: []
+}
 
 //////////////////////////////////////////////////////////////////////////////////////
 ///

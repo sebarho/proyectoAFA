@@ -1,3 +1,4 @@
+https://deepwiki.com/scummvm/scummvm/2.4-scumm-engine
 
 # AFA Script Utility (AFASU)
 

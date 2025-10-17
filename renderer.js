@@ -105,26 +105,6 @@ export function drawScene(ui) {
     ui.ctx.fillStyle = scene.background.wall;
     ui.ctx.fillRect(0, 0, ui.ctx.canvas.width, 310);
 
-    //OLD:
-    // if (gameState.currentScene === 'quincho') {
-    //     const brickWidth = 40;
-    //     const brickHeight = 15;
-    //     const wallWidth = ctx.canvas.width;
-    //     const wallHeight = 310;
-    //     ctx.fillStyle = '#A0522D'; // Dark orange for brick background
-    //     ctx.fillRect(0, 0, wallWidth, wallHeight);
-
-    //     ctx.strokeStyle = '#8B4513'; // Dark brown for mortar
-    //     ctx.lineWidth = 1;
-
-    //     for (let y = 0; y < wallHeight; y += brickHeight) {
-    //         for (let x = 0; x < wallWidth; x += brickWidth) {
-    //             let offsetX = (y / brickHeight) % 2 === 0 ? 0 : brickWidth / 2;
-    //             ctx.strokeRect(x - offsetX, y, brickWidth, brickHeight);
-    //         }
-    //     }
-    // }
-
     ui.ctx.fillStyle = scene.background.floor;
     ui.ctx.fillRect(0, 310, ui.ctx.canvas.width, ui.ctx.canvas.height - 310);
 
@@ -133,7 +113,6 @@ export function drawScene(ui) {
         ...scene.objects.map(objectKey => ({ key: objectKey, data: gameData.objects[objectKey], type: 'object' })),
         ...scene.characters.map(charKey => ({ key: charKey, data: gameData.characters[charKey], type: 'character' }))
     ].sort((a, b) => (a.y + (a.height || 0)) - (b.y + (b.height || 0)));
-
     drawOrder.forEach(obj => {
         if (!obj.data) return; // Prevents crash if character data is missing
         const isHovered = gameState.hoverTarget && gameState.hoverTarget.key === obj.key;

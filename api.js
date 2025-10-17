@@ -63,6 +63,7 @@ export function runScript(name) {
 
 export function say(what) {
     //dialogueText.textContent = what;
+    console.log(what);
     const textLen = what.length;
     const textSpeed = textLen * uiOptions.dialogueSpeed;
     console.log("say: " + what + " (len=" + textLen + ", speed=" + textSpeed + "ms)");
@@ -142,7 +143,7 @@ export function startDialogue(listener, nodeID) {
         console.warn(`startDialogue: No se pudo iniciar el diálogo.`);
         return;
     }
-    console.log(`startDialogue: Iniciando diálogo "${nodeID}" entre "${speaker.name}" y "${listener}".`);
+    console.log(`startDialogue: Iniciando diálogo "${nodeID}" entre "${speaker}" y "${listener}".`);
     startDial(speaker, listener, nodeID);
 }
 //////////////////////////////////////////////////////////////////////////////////////
@@ -250,7 +251,7 @@ export function dropItem(itemName) {
      */
     const character = gameData.characters[gameState.currentPlayer];
     if (!character || !Array.isArray(character.inventories)) {
-        console.warn(`dropItem: El personaje "${state.currentPlayer}" no tiene inventario.`);
+        console.warn(`dropItem: El personaje "${gameState.currentPlayer}" no tiene inventario.`);
         return;
     }
     const itemIndex = character.inventories.indexOf(itemName);
@@ -262,6 +263,25 @@ export function dropItem(itemName) {
     console.log(`dropItem: El ítem "${itemName}" ha sido soltado.`);
     const scene = gameData.scenes[gameState.currentScene];
     scene.items.push(itemName);
+}
+//////////////////////////////////////////////////////////////////////////////////////
+
+export function removeItemFromInventory(itemName) {
+    /**
+     * 
+     */
+    const character = gameData.characters[gameState.currentPlayer];
+    if (!character || !Array.isArray(character.inventories)) {
+        console.warn(`removeItemFromInventory: El personaje "${gameState.currentPlayer}" no tiene inventario.`);
+        return;
+    }
+    const itemIndex = character.inventories.indexOf(itemName);
+    if (itemIndex === -1) {
+        console.warn(`removeItemFromInventory: El ítem "${itemName}" no está en el inventario de "${gameState.currentPlayer}".`);
+        return;
+    }
+    character.inventories.splice(itemIndex, 1);
+    console.log(`removeItemFromInventory: El ítem "${itemName}" ha sido removido del inventario.`);
 }
 //////////////////////////////////////////////////////////////////////////////////////
 

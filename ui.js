@@ -33,9 +33,33 @@ const dialogueQueue = [];
 
 let dialogueActive = false;
 
+let isDragging = false;
+let cursorX = 0;
+let cursorY = 0;
+
 export function initUI() {
     console.log("Initializing User Interface...")
-    // Get the UI objects
+    getUIObjects(); // Get the UI objects
+    addEventListeners(); //Registra los eventos de mouse en el canvas en el Event Loop
+    setupCharacterSwitcher();
+    console.log('...Game initialized successfully.');
+}
+
+
+function addEventListeners() {
+    ui.document.addEventListener('keydown', handleKeyPress);
+    ui.canvas.addEventListener('mouseleave', handleCanvasMouseLeave);
+    ui.canvas.addEventListener('mousemove', handleCanvasMousemove);
+    ui.canvas.addEventListener('click', handleClick); //handleCanvasClick);
+    ui.canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    ui.canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    ui.canvas.addEventListener('touchend', handleTouchEnd);
+
+    document.querySelectorAll('.verb-button').forEach(b => b.addEventListener('click', () => handleVerbClick(b.textContent)));
+    console.log(' - Event listeners registered.');
+}
+
+function getUIObjects() {
     ui.document = document;
     ui.actionContainer = document.getElementById('action-container');
     ui.actionBox = document.getElementById('action-box');
@@ -48,23 +72,7 @@ export function initUI() {
     ui.canvas = document.getElementById('game-canvas');
     ui.ctx = ui.canvas.getContext('2d');
     console.log(' - UI objects created.');
-
-    //Registra los eventos de mouse en el canvas en el Event Loop
-    ui.document.addEventListener('keydown', handleKeyPress);
-    ui.canvas.addEventListener('mouseleave', handleCanvasMouseLeave);
-    ui.canvas.addEventListener('mousemove', handleCanvasMousemove);
-    ui.canvas.addEventListener('click', handleClick); //handleCanvasClick);
-    document.querySelectorAll('.verb-button').forEach(b => b.addEventListener('click', () => handleVerbClick(b.textContent)));
-    console.log('game.js: Event listeners registered.');
-
-    //Carga los controles de personajes e inventario
-    setupCharacterSwitcher();
-    console.log(' - Character switcher set up.');
-
-    //updateInventoryView(ui);
-    console.log('...Game initialized successfully.');
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +96,6 @@ export function createVerbButtons() {
         const button = document.createElement('button');
         button.textContent = config.label;
         button.className = 'verb-button';
-        //button.addEventListener('click', () => handleVerbClick(key));
         verbBar.appendChild(button);
     });
 }
@@ -111,9 +118,6 @@ export function setupCharacterSwitcher() {
 
     //Cleans the character switcher
     ui.characterSwitcher.innerHTML = ""
-
-    // Create a title
-    //ui.characterSwitcher.innerHTML = '<h3>Amigos:</h3>';
 
     // Now, creates a button per playable character (actor)
     Object.entries(getGameData().characters).forEach(([key, char]) => {
@@ -143,6 +147,7 @@ export function setupCharacterSwitcher() {
             ui.characterSwitcher.appendChild(avatar);
         };
     });
+    console.log(' - Character switcher set up.');
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
@@ -165,19 +170,7 @@ function setupInventoryItemEvents(itemElement, itemData) {
         ui.actionText.textContent = "";
     });
 
-    // Click -> marcar en actionState (pero sin toggle visual permanente)
     itemElement.addEventListener("click", () => {
-        // if (actionState.item) {
-        //     // Si ya había un item seleccionado, esto actúa como target
-        //     actionState.target = itemData;
-        //     //TODO: Borrar esta linea? executeAction(window.actionState); // acá iría tu lógica
-        //     actionState.item = null;
-        //     actionState.target = null;
-        // } else {
-        //     // Primer click -> definir como "item"
-        //     actionState.item = itemData;
-        //     //TODO: Borrar esta linea? document.getElementById("action-text").textContent = `${itemData.name} seleccionado`;
-        // }
         handleClick();
     });
 }
@@ -315,15 +308,12 @@ function updateDialogueView() {
         return;
     }
 
-    //dialogueText.textContent = `Hablando con ${characters[listener].alias}...`;
-    //ui.dialogueOptionsContainer.innerHTML = '';
-
     if (Array.isArray(currentNode)) {
         currentNode.forEach(option => {
             const optionEl = document.createElement('div');
             optionEl.className = 'dialogue-option';
             optionEl.textContent = `> ${option.player}`;
-            optionEl.addEventListener('click', () => selectDialogueOption(option, ui));
+            optionEl.addEventListener('click', () => selectDialogueOption(option));
             ui.dialogueContainer.appendChild(optionEl);
         });
     } else {
@@ -331,7 +321,7 @@ function updateDialogueView() {
         const optionEl = document.createElement('div');
         optionEl.className = 'dialogue-option';
         optionEl.textContent = `> ${currentNode.player}`;
-        optionEl.addEventListener('click', () => selectDialogueOption(currentNode, ui));
+        optionEl.addEventListener('click', () => selectDialogueOption(currentNode));
         ui.dialogueContainer.appendChild(optionEl);
     }
     // Aqui no se llama a ninguna funcion y se espera a que el usuario elija una opcion
@@ -355,11 +345,14 @@ export function selectDialogueOption(option) {
 
     //TODO: Revisar este sistema de incluir dar un objeto 
     // quizas estaria bueno pensar en invisibilizar opciones del mismo modo
+    console.log(gameState.dialogue);
     if (option.givesItem) {
-        const itemIndex = getGameData.characters[listener].inventory.indexOf(option.givesItem);
+        const itemIndex = getGameData().characters[listener].inventory.indexOf(option.givesItem);
         if (itemIndex > -1) {
-            getGameData().characters[listener].inventory.splice(itemIndex, 1);
-            getGameData().characters[speaker].inventory.push(option.givesItem);
+            const linv = getGameData().characters[listener].inventory;
+            linv.splice(itemIndex, 1);
+            const sinv =getGameData().characters[speaker].inventory
+            sinv.push(option.givesItem);
             updateInventoryView();
         }
     }
@@ -472,7 +465,7 @@ export function updateActionText() {
     if (verbData) {
         let itemText = '';
 
-        if (gameState.actionState.item.key !=null) {
+        if (gameState.actionState.item.key != null) {
             const itemData = getItemData(gameState.actionState.item.key);
             itemText = itemData ? itemData.name : gameState.actionState.item.key.replace(/_/g, ' ');
         }
@@ -587,3 +580,97 @@ function getTargetAt(x, y) {
     // Si no se encontró ningún target bajo el mouse, devuelve null
     return null;
 }
+
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////
+//////////    T O U C H   S C R E E N S
+//////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+
+function drawCursor(x, y) {
+    /**
+     * Draws the "cursor"
+     */
+    ui.ctx.clearRect(0, 0, ui.canvas.width, ui.canvas.height);
+    ui.ctx.beginPath();
+    ui.ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ui.ctx.fillStyle = 'red';
+    ui.ctx.fill();
+}
+//////////////////////////////////////////////////////////////////////////////////////
+
+function getTouchPos(touchEvent) {
+    /**
+     * Convert touch coordinates to canvas coordinates
+     */
+    const rect = ui.canvas.getBoundingClientRect();
+    const touch = touchEvent.touches[0];
+    return {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+    };
+}
+//////////////////////////////////////////////////////////////////////////////////////
+
+function isInsideCanvas(x, y) {
+    /**
+     * Verifica si el punto está dentro del canvas
+     */
+    return x >= 0 && x <= ui.canvas.width && y >= 0 && y <= ui.canvas.height;
+}
+//////////////////////////////////////////////////////////////////////////////////////
+
+function handleTouchStart(e) {
+    /**
+     * Start dragging
+     */
+    e.preventDefault();
+    isDragging = true;
+    const rect = ui.canvas.getBoundingClientRect();
+    const t = e.touches[0];
+    const x = t.clientX - rect.left;
+    const y = t.clientY - rect.top;
+    if (isInsideCanvas(x, y)) {
+        cursorX = x;
+        cursorY = y;
+    drawCursor(cursorX, cursorY);
+  }
+}
+//////////////////////////////////////////////////////////////////////////////////////
+
+function handleTouchMove(e) {
+    /**
+     * Handles the finger movement
+     */
+    if (!isDragging) return;
+    e.preventDefault();
+    const rect = ui.canvas.getBoundingClientRect();
+    const t = e.touches[0];
+    const x = t.clientX - rect.left;
+    const y = t.clientY - rect.top;
+    if (isInsideCanvas(x, y)) {
+        cursorX = x;
+        cursorY = y;
+        drawCursor(cursorX, cursorY);
+    }
+    // Pass the control to handleMouseMove
+    const touch = e.touches[0];
+    const simulatedEvent = {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+    };
+    handleCanvasMousemove(simulatedEvent);
+}
+//////////////////////////////////////////////////////////////////////////////////////
+
+function handleTouchEnd(e) {
+    /**
+     * Finishes the dragging
+     */
+    isDragging = false;
+    // Pass control to 'handleClick'
+    handleClick();
+}
+//////////////////////////////////////////////////////////////////////////////////////
