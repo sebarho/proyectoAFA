@@ -42,7 +42,7 @@ export const gameState = {
 
 export const globals = {
     debugMode: false,
-    engineVersion: '0.8.1 - Touch support',
+    engineVersion: '0.8.2 - Winnable!',
     engineName: "AFAengine",
 };
 
@@ -304,3 +304,4 @@ export function getItemData(itemName) {
     return null
 }
 //////////////////////////////////////////////////////////////////////////////////////
+

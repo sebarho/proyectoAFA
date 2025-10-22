@@ -5,6 +5,7 @@ import * as api from "./api.js";
 
 export const storyData = {
     inits: {
+        storyName: 'El AFA - La Aventura Grafica',
         player: 'Pancho',
         scene: 'quincho'
     },
@@ -67,7 +68,7 @@ export const storyData = {
         'Pancho': {
             name: 'Pancho', alias: 'Pancho', description: "Pancho: El Anfitrión.",
             inventory: [],
-            x: 100, y: 150, width: 130, height: 220,
+            x: 70, y: 150, width: 130, height: 220,
             image: 'assets/images/characters/Pancho.png',
             playable: true
         },
@@ -166,10 +167,10 @@ export const storyData = {
     },
 
     items: {
-        'vaso_vacio': { name: 'Vaso (vacío)', x: 180, y: 280, width: 15, height: 20, color: '#fff6f0ff', description: "Un vaso vacío. Al menos no es de plástico.", canBePickedUp: true},
-        'vaso_coca': { name: 'Vaso con coca', x: 180, y: 280, width: 15, height: 20, color: '#8b4814ff', description: "Un refrescante vaso de Coto Cola helada.", canBePickedUp: true},
-        'vaso_fernet': { name: 'Vaso de fernet', x: 180, y: 280, width: 15, height: 20, color: '#2A1A10', description: "Un vaso con 30% de fernet. Ni siquiera es medio lleno...", canBePickedUp: true},
-        'vaso_preparado': { name: 'Vaso de fernet', x: 180, y: 280, width: 15, height: 20, color: '#653e26ff', description: "Un vaso de fernet con coca. Un clásico.", canBePickedUp: true},
+        'vaso_vacio': { name: 'Vaso (vacío)', x: 190, y: 280, width: 15, height: 20, color: '#fff6f0ff', description: "Un vaso vacío. Al menos no es de plástico.", canBePickedUp: true},
+        'vaso_coca': { name: 'Vaso con coca', x: 190, y: 280, width: 15, height: 20, color: '#8b4814ff', description: "Un refrescante vaso de Coto Cola helada.", canBePickedUp: true},
+        'vaso_fernet': { name: 'Vaso de fernet', x: 190, y: 280, width: 15, height: 20, color: '#2A1A10', description: "Un vaso con 30% de fernet. Ni siquiera es medio lleno...", canBePickedUp: true},
+        'vaso_preparado': { name: 'Vaso de fernet', x: 190, y: 280, width: 15, height: 20, color: '#653e26ff', description: "Un vaso de fernet con coca. Un clásico.", canBePickedUp: true},
         'botella_fernet': { name: 'Botella de Fernet', x: 200, y: 250, width: 20, height: 50, color: '#1A0A00', description: "Fernet Branca. El elixir de los dioses cordobeses.", canBePickedUp: true},
         'coto_cola': { name: 'Botella de Coto-Cola', x: 230, y: 250, width: 20, height: 45, color: '#A00000', description: "No es Coca-Cola, pero se parece bastante.", canBePickedUp: true},
         'vino_tinto': { name: 'Vino Tinto', x: 280, y: 250, width: 20, height: 48, color: '#7B1113', description: "Un vino tinto. Para paladares sofisticados.", canBePickedUp: true},
@@ -194,7 +195,7 @@ export const storyData = {
                 'salida_cocina'
             ],
             items: [
-                'vaso_fernet',
+                'vaso_vacio',
                 'botella_fernet',
                 'coto_cola',
                 'vino_tinto',
@@ -203,7 +204,7 @@ export const storyData = {
                 'mani',
                 'encendedor'
             ],
-            characters: ['Pancho', 'Sebastian', 'Bocha', 'Ale', 'Rata', 'Agus']
+            characters: ['Pancho', 'Sebastian', 'Bocha', 'Rata', 'Agus']
         },
         'patio': {
             name: 'Patio',
@@ -437,7 +438,7 @@ export const storyData = {
                 {
                     player: "Che, Rata, ¿cómo viene ese fuego?",
                     npc: "Todavía no lo prendí. Estoy esperando que me traigan el carbón. Y el fernet.",
-                    leadsTo: "rata_asado_1"
+                    leadsTo: "rata_fernet"
                 },
                 {
                     player: "¿Te doy una mano con la parrilla?",
@@ -454,6 +455,15 @@ export const storyData = {
                 {
                     player: "¿Y el fernet?",
                     npc: "¡Y el fernet! ¿Qué te pensás, que el fuego se prende solo? Necesito combustible.",
+                    leadsTo: "end"
+                }
+            ],
+            rata_fernet: [
+                {
+                    player: "Ahí te traigo el fernet.",
+                    npc: "¡Uy ahora si! Gracias, loco. Sos un capo.",
+                    npc: "glu glu glu glu.. ahhhh.",
+                    npc: "Listo papu... A TRABAJAR",
                     leadsTo: "end"
                 }
             ]
@@ -616,7 +626,7 @@ export const storyData = {
                 {
                     player: "Dale, gracias. Es solo para eso.",
                     npc: "Más te vale. Que después no lo encuentro más.",
-                    givesItem: 'encendedor',
+                    runScript: 'agus_dar_encendedor',
                     leadsTo: "end"
                 },
                 {
@@ -737,8 +747,8 @@ export const storyScripts = {
     'usar_bolsa_carbon_parrilla': () => {
         const parrilla = api.getGameData().objects.parrilla;
         parrilla.hasCarbon = true;
-        api.say("EL carbon ya esta puesto");
-        api.removeItemFromInventory('bolsa_carbon');
+        api.say("Listo. El carbon ya esta puesto");
+        api.removeItemFromActor(api.getGameState().currentPlayer, 'bolsa_carbon');
     },
     'usar_encendedor_parrilla': () => {
         const parrilla = api.getGameData().objects.parrilla;
@@ -749,6 +759,7 @@ export const storyScripts = {
             api.say("Primero hay que poner el carbón.");
         } else if (parrilla.isLit) {
             api.say("El fuego ya está prendido.");
+            api.say("No le pienso devolver el encendedor al Muñeco (jijijiji)");
         } else {
             api.say("No funciona.");
         }
@@ -756,7 +767,7 @@ export const storyScripts = {
     'usar_carne_parrilla': () => {
         const parrilla = api.getGameData().objects.parrilla;
         if (api.getGameState().currentPlayer === 'Rata') {
-            if (parrilla.isLit && api.getGameState().inventories[api.getGameState().currentPlayer].includes('carne')) {
+            if (parrilla.isLit && api.getGameData().characters[api.getGameState().currentPlayer].inventory.includes('carne')) {
                 api.say("¡A la parrilla! En un rato comemos.");
             } else if (!parrilla.isLit) {
                 api.say("Primero hay que prender el fuego.");
@@ -823,17 +834,53 @@ export const storyScripts = {
         api.say("Si no fuera por mi...");
         api.say("...estos pibes no comen. (Ratapedia 20:41)");
     },
-    'usar_coto_cola_vacio_vacio': () => {
+    'usar_coto_cola_vaso_vacio': () => {
         api.say("Por suerte compraron una botella grande.");
-    }
-    ,
-    'usar_fernet_vacio_vacio': () => {
+        api.say("Solo 70% de agua azucarada....");
+        api.switchItem('vaso_vacio', 'vaso_coca');
+    },
+    'usar_botella_fernet_vaso_vacio': () => {
         api.say("Por suerte compraron una botella grande.");
+        api.switchItem('vaso_vacio', 'vaso_fernet');
     },
     'usar_coto_cola_vaso_fernet': () => {
         api.say("soy cun crack haciendo tragos.");
+        api.switchItem('vaso_fernet', 'vaso_preparado');
     },
-    'usar_fernet_vacio_coca': () => {
-        api.say("Por suerte compraron una botella grande.");
+    'usar_botella_fernet_vaso_coca': () => {
+        api.say("Y por ultimo 30% de fernandito..."); 
+        api.say("soy cun crack haciendo tragos.");
+        api.switchItem('vaso_coca', 'vaso_preparado');
+    },
+    'agus_dar_encendedor': () => {
+        api.removeItemFromActor('agus', 'encendedor');
+        api.addItemToActor(api.getGameState().currentPlayer, 'encendedor');
+        api.say("¡Gracias Agus!");
+        api.getGameData().dialogueMatrix['Agus'].start[2] = {
+            player: "Gracias por el encendedor, Agus.",
+            npc: "De nada, loco. Es mi funcion en este juego.",
+            leadsTo: "end"
+        };
+    },
+    'dar_vaso_preparado_rata': () => {
+        if (api.actorHasItem(api.getGameState().currentPlayer, 'vaso_preparado')) {
+            api.removeItemFromActor(api.getGameState().currentPlayer, 'vaso_preparado');
+            api.say("Aquí tienes un vaso de fernet.");
+            api.say("Rata: glu glu glu... Ahhh.");
+            api.say("Listo papu... A TRABAJAR");
+            api.addPlayer('Rata');
+        } else {
+            api.say("Deberia agarrarlo primero.");
+        }
+    },
+    'dar_carne_rata': () => {
+        if (api.actorHasItem(api.getGameState().currentPlayer, 'carne')) {
+            api.removeItemFromActor(api.getGameState().currentPlayer, 'carne');
+            api.say("Aquí tienes la carne para el asado.");
+            api.say("Rata: ¡Perfecto! Ahora sí que vamos a comer bien.");
+            api.addItemToActor('Rata', 'carne');
+        } else {
+            api.say("Deberia agarrarlo primero.");
+        }
     }
 };

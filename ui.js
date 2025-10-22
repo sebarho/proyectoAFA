@@ -1,3 +1,4 @@
+import { runScript } from "./api.js";
 import {
     gameState,
     getVerbConfig,
@@ -7,6 +8,7 @@ import {
     handleClick,
     globals,
     handleVerbClick,
+    runActionScript
 } from "./engine.js";
 
 export const uiOptions = {
@@ -42,6 +44,7 @@ export function initUI() {
     getUIObjects(); // Get the UI objects
     addEventListeners(); //Registra los eventos de mouse en el canvas en el Event Loop
     setupCharacterSwitcher();
+    ui.document.title = getGameData().inits.storyName || "AFA Adventure Game";
     console.log('...Game initialized successfully.');
 }
 
@@ -54,6 +57,8 @@ function addEventListeners() {
     ui.canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
     ui.canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
     ui.canvas.addEventListener('touchend', handleTouchEnd);
+
+    ui.actionText.addEventListener('click', handleClick);
 
     document.querySelectorAll('.verb-button').forEach(b => b.addEventListener('click', () => handleVerbClick(b.textContent)));
     console.log(' - Event listeners registered.');
@@ -346,15 +351,19 @@ export function selectDialogueOption(option) {
     //TODO: Revisar este sistema de incluir dar un objeto 
     // quizas estaria bueno pensar en invisibilizar opciones del mismo modo
     console.log(gameState.dialogue);
-    if (option.givesItem) {
-        const itemIndex = getGameData().characters[listener].inventory.indexOf(option.givesItem);
-        if (itemIndex > -1) {
-            const linv = getGameData().characters[listener].inventory;
-            linv.splice(itemIndex, 1);
-            const sinv =getGameData().characters[speaker].inventory
-            sinv.push(option.givesItem);
-            updateInventoryView();
-        }
+    // if (option.givesItem) {
+    //     const itemIndex = getGameData().characters[listener].inventory.indexOf(option.givesItem);
+    //     if (itemIndex > -1) {
+    //         const linv = getGameData().characters[listener].inventory;
+    //         linv.splice(itemIndex, 1);
+    //         const sinv =getGameData().characters[speaker].inventory
+    //         sinv.push(option.givesItem);
+    //         updateInventoryView();
+    //     }
+    // }
+    if (option.runScript) {
+        console.log("Running dialogue script: " + option.runScript);
+        runActionScript(option.runScript);
     }
 
     const nextNodeKey = option.leadsTo;

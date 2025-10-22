@@ -37,10 +37,11 @@ export function addPlayer(name) {
     /**
      * Makes a character playable and updates de character switcher
      */
-    if (gameData.characters.includes(name)) {
-        gameData.characters[name].playable = true;
-        setupCharacterSwitcher;
-    }
+    const chars = gameData.characters;
+    //if (chars.includes(name)) {
+        chars[name].playable = true;
+        setupCharacterSwitcher();
+    //}
 }
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -129,9 +130,10 @@ export function removeItemFromActor(characterName, itemName) {
         character.inventory.splice(index, 1);
         console.log(`removeItemFromCharacter: Se quitó "${itemName}" del inventario de "${characterName}".`);
     }
-
+    console
     if (gameState.currentPlayer === characterName) {
         updateInventoryView();
+        console.log(`removeItemFromCharacter: Inventario de "${characterName}" actualizado en la UI.`);
     }
 }
 //////////////////////////////////////////////////////////////////////////////////////
@@ -263,25 +265,6 @@ export function dropItem(itemName) {
     console.log(`dropItem: El ítem "${itemName}" ha sido soltado.`);
     const scene = gameData.scenes[gameState.currentScene];
     scene.items.push(itemName);
-}
-//////////////////////////////////////////////////////////////////////////////////////
-
-export function removeItemFromInventory(itemName) {
-    /**
-     * 
-     */
-    const character = gameData.characters[gameState.currentPlayer];
-    if (!character || !Array.isArray(character.inventories)) {
-        console.warn(`removeItemFromInventory: El personaje "${gameState.currentPlayer}" no tiene inventario.`);
-        return;
-    }
-    const itemIndex = character.inventories.indexOf(itemName);
-    if (itemIndex === -1) {
-        console.warn(`removeItemFromInventory: El ítem "${itemName}" no está en el inventario de "${gameState.currentPlayer}".`);
-        return;
-    }
-    character.inventories.splice(itemIndex, 1);
-    console.log(`removeItemFromInventory: El ítem "${itemName}" ha sido removido del inventario.`);
 }
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -439,11 +422,11 @@ export function actorHasItem(characterName, itemName) {
         return false;
     }
     const character = gameData.characters[characterName];
-    if (!character || !Array.isArray(character.inventories)) {
+    if (!character || !Array.isArray(character.inventory)) {
         console.warn(`actorHasItem: El personaje "${characterName}" no tiene inventario.`);
         return false;
     }
-    return character.inventories.includes(itemName);
+    return character.inventory.includes(itemName);
 }
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -567,5 +550,23 @@ export function clearTimer(timerID) {
      * Cancela un temporizador previamente establecido.
      */
     //TODO: Implementar
+}
+//////////////////////////////////////////////////////////////////////////////////////
+
+export function switchItem(oldItemName, newItemName) {
+    if (actorHasItem(gameState.currentPlayer, oldItemName)) {
+        console.log(`switchItem: Cambiando "${oldItemName}" por "${newItemName}".`);
+        removeItemFromActor(gameState.currentPlayer, oldItemName);
+        addItemToActor(gameState.currentPlayer, newItemName);
+    } else {
+        if (gameData.scenes[gameState.currentScene].items.includes(oldItemName)) {
+            console.log(`switchItem: Cambiando "${oldItemName}" por "${newItemName}" en la escena.`);
+            gameData.scenes[gameState.currentScene].items = gameData.scenes[gameState.currentScene].items.filter(item => item !== oldItemName);
+            gameData.scenes[gameState.currentScene].items.push(newItemName);
+        } else {
+            console.warn(`switchItem: El ítem "${oldItemName}" no está en el inventario del jugador ni en la escena actual.`);
+            return;
+        }
+    }
 }
 //////////////////////////////////////////////////////////////////////////////////////
