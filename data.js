@@ -153,7 +153,7 @@ export const storyData = {
 
     objects: {
         'parrilla': {
-            name: 'Parrilla', x: 650, y: 220, width: 100, height: 100, description: "La parrilla. El altar de El AFA. Todavía está apagada.",
+            name: 'Parrilla', x: 650, y: 220, width: 100, height: 50, description: "La parrilla. El altar de El AFA. Todavía está apagada.",
             hasCarbon: false,
             isLit: false
         },
@@ -189,6 +189,7 @@ export const storyData = {
         'quincho': {
             name: 'Quincho',
             background: { wall: '#A0522D', floor: '#5C4033' },
+            image: 'assets/images/scenes/quincho.jpg',
             objects: [
                 'parrilla',
                 'mesa',
@@ -210,6 +211,7 @@ export const storyData = {
         'patio': {
             name: 'Patio',
             background: { wall: '#87CEEB', floor: '#228B22' },
+            image: 'assets/images/scenes/patio.jpg', 
             objects: [
                 'pileta',
                 'entrada_quincho'
@@ -224,6 +226,7 @@ export const storyData = {
             name: 'Cocina',
             background: { wall: '#F5F5DC', floor: '#D2B48C' },
             objects: ['heladera', 'mesada', 'salida_quincho'],
+            image: 'assets/images/scenes/cocina.jpg', 
             items: [
                 'carne'
             ],
@@ -932,6 +935,14 @@ export const storyScripts = {
             api.addItemToActor('Rata', 'carne');
         } else {
             api.say("Deberia agarrarlo primero.");
+        }
+    },
+    'abrir_heladera': () => {
+        const heladera = api.getGameData().objects.heladera;
+        if (heladera.isStuck) {
+            api.say("La heladera está trabada. Parece que necesito algo para abrirla.");
+        } else {
+            api.say("La heladera está abierta.");
         }
     }
 };

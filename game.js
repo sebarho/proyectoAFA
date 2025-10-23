@@ -40,6 +40,8 @@ function recolectarRutasDeImagen() {
 
     // Recorre todas las escenas definidas en gameData.scenes
     Object.values(getGameData().scenes).forEach(scene => {
+        // Si la escena tiene una imagen de fondo definida, la agrega
+        if (scene.image !== undefined) allImagePaths.push(scene.image);
 
         // Dentro de cada escena, recorre los objetos interactivos
         Object.values(scene.objects).forEach(obj => {

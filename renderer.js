@@ -100,14 +100,18 @@ export function drawScene(ui) {
     const scene = gameData.scenes[gameState.currentScene];
 
     ui.ctx.clearRect(0, 0, ui.ctx.canvas.width, ui.ctx.canvas.height);
-
+    if (scene.image === undefined) {
     // Draw background (wall and floor)
     ui.ctx.fillStyle = scene.background.wall;
     ui.ctx.fillRect(0, 0, ui.ctx.canvas.width, 310);
 
     ui.ctx.fillStyle = scene.background.floor;
     ui.ctx.fillRect(0, 310, ui.ctx.canvas.width, ui.ctx.canvas.height - 310);
-
+    } else {
+        const bgImg = imageAssets[scene.image];
+        drawBackground(ui.ctx, bgImg);
+    }
+    // Draw objects, items, and characters in correct order based on Y position
     const drawOrder = [
         ...scene.items.filter(itemKey => !gameData.items[itemKey].isHidden).map(itemKey => ({ key: itemKey, data: gameData.items[itemKey], type: 'item' })),
         ...scene.objects.map(objectKey => ({ key: objectKey, data: gameData.objects[objectKey], type: 'object' })),
@@ -170,6 +174,12 @@ function printDebugInfo(ui) {
         ui.ctx.fillText("Last Inter.  Time: " + gameState.lastInteractionTime, 0, line * sep); line++;
         ui.ctx.fillText("VerbConfig: ...... " + getVerbConfig(), 0, line * sep); line++;
     }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+function drawBackground(ctx,image) {
+    ctx.drawImage(image, 0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
