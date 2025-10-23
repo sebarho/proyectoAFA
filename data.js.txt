@@ -152,10 +152,9 @@ export const storyData = {
     },
 
     objects: {
-        'parrilla': {
-            name: 'Parrilla', x: 650, y: 220, width: 100, height: 100, description: "La parrilla. El altar de El AFA. Todavía está apagada.",
+        'parrilla': { name: 'Parrilla', x: 650, y: 220, width: 100, height: 100, description: "La parrilla. El altar de El AFA. Todavía está apagada.",
             hasCarbon: false,
-            isLit: false
+            isLit: false 
         },
         'mesa': { name: 'Mesa', x: 175, y: 290, width: 350, height: 60, description: "Una mesa. Ideal para apoyar los codos y criticar." },
         'salida_patio': { name: 'Salida al Patio', x: 780, y: 150, width: 20, height: 160, description: "Hacia el verde césped.", exits: "patio" },
@@ -168,21 +167,21 @@ export const storyData = {
     },
 
     items: {
-        'vaso_vacio': { name: 'Vaso (vacío)', x: 190, y: 280, width: 15, height: 20, color: '#fff6f0ff', description: "Un vaso vacío. Al menos no es de plástico.", canBePickedUp: true },
-        'vaso_coca': { name: 'Vaso con coca', x: 190, y: 280, width: 15, height: 20, color: '#8b4814ff', description: "Un refrescante vaso de Coto Cola helada.", canBePickedUp: true },
-        'vaso_fernet': { name: 'Vaso de fernet', x: 190, y: 280, width: 15, height: 20, color: '#2A1A10', description: "Un vaso con 30% de fernet. Ni siquiera es medio lleno...", canBePickedUp: true },
-        'vaso_preparado': { name: 'Vaso de fernet', x: 190, y: 280, width: 15, height: 20, color: '#653e26ff', description: "Un vaso de fernet con coca. Un clásico.", canBePickedUp: true },
-        'botella_fernet': { name: 'Botella de Fernet', x: 200, y: 250, width: 20, height: 50, color: '#1A0A00', description: "Fernet Branca. El elixir de los dioses cordobeses.", canBePickedUp: true },
-        'coto_cola': { name: 'Botella de Coto-Cola', x: 230, y: 250, width: 20, height: 45, color: '#A00000', description: "No es Coca-Cola, pero se parece bastante.", canBePickedUp: true },
-        'vino_tinto': { name: 'Vino Tinto', x: 280, y: 250, width: 20, height: 48, color: '#7B1113', description: "Un vino tinto. Para paladares sofisticados.", canBePickedUp: true },
-        'vino_blanco': { name: 'Vino Blanco', x: 310, y: 250, width: 20, height: 48, color: '#F1E5AC', description: "Un vino blanco. Refrescante.", canBePickedUp: true },
+        'vaso_vacio': { name: 'Vaso (vacío)', x: 190, y: 280, width: 15, height: 20, color: '#fff6f0ff', description: "Un vaso vacío. Al menos no es de plástico.", canBePickedUp: true},
+        'vaso_coca': { name: 'Vaso con coca', x: 190, y: 280, width: 15, height: 20, color: '#8b4814ff', description: "Un refrescante vaso de Coto Cola helada.", canBePickedUp: true},
+        'vaso_fernet': { name: 'Vaso de fernet', x: 190, y: 280, width: 15, height: 20, color: '#2A1A10', description: "Un vaso con 30% de fernet. Ni siquiera es medio lleno...", canBePickedUp: true},
+        'vaso_preparado': { name: 'Vaso de fernet', x: 190, y: 280, width: 15, height: 20, color: '#653e26ff', description: "Un vaso de fernet con coca. Un clásico.", canBePickedUp: true},
+        'botella_fernet': { name: 'Botella de Fernet', x: 200, y: 250, width: 20, height: 50, color: '#1A0A00', description: "Fernet Branca. El elixir de los dioses cordobeses.", canBePickedUp: true},
+        'coto_cola': { name: 'Botella de Coto-Cola', x: 230, y: 250, width: 20, height: 45, color: '#A00000', description: "No es Coca-Cola, pero se parece bastante.", canBePickedUp: true},
+        'vino_tinto': { name: 'Vino Tinto', x: 280, y: 250, width: 20, height: 48, color: '#7B1113', description: "Un vino tinto. Para paladares sofisticados.", canBePickedUp: true},
+        'vino_blanco': { name: 'Vino Blanco', x: 310, y: 250, width: 20, height: 48, color: '#F1E5AC', description: "Un vino blanco. Refrescante.", canBePickedUp: true},
         'papas_fritas': { name: 'Papas Fritas', x: 380, y: 280, width: 40, height: 20, color: '#FFD700', description: "Un bowl con papas fritas. Imposible comer solo una.", canBePickedUp: true },
         'mani': { name: 'Maní', x: 430, y: 280, width: 40, height: 20, color: '#D2B48C', description: "Un bowl con maní. El clásico de la picada.", canBePickedUp: true },
         'encendedor': { name: 'Encendedor', x: -100, y: -100, width: 15, height: 25, color: '#FFD700', description: "Un encendedor. Siempre útil.", canBePickedUp: true, isHidden: true },
         'pala_jardin': { name: 'Pala de Jardín', x: 350, y: 300, width: 25, height: 60, color: '#8B4513', description: "Una pala de jardín. Parece resistente.", canBePickedUp: true },
         'bolsa_carbon': { name: 'Bolsa de Carbón', x: 380, y: 300, width: 40, height: 50, color: '#3D2B1F', description: "Una bolsa de carbón. Indispensable.", canBePickedUp: true },
         'carne': { name: 'Carne', x: 125, y: 200, width: 70, height: 40, color: '#800000', description: "El corazón de El AFA. Unos buenos cortes de vacío y tira de asado.", canBePickedUp: true, isHidden: true }
-
+        
     },
 
     scenes: {
@@ -462,6 +461,8 @@ export const storyData = {
             rata_fernet: [
                 {
                     player: "Ahí te traigo el fernet.",
+                    npc: "¡Uy ahora si! Gracias, loco. Sos un capo.",
+                    npc: "glu glu glu glu.. ahhhh.",
                     npc: "Listo papu... A TRABAJAR",
                     leadsTo: "end"
                 }
@@ -702,9 +703,8 @@ export const storyScripts = {
                 break;
             }
             case "AGARRAR": {
-                if (api.getItem(as.item.key) == false) {
-                    api.runScript("no_puedo");
-                }
+                api.getItem(as.item.key)
+                // say("No puedo agarrar eso.");
                 break;
             }
             case "USAR": {
@@ -719,35 +719,8 @@ export const storyScripts = {
             case "IR": {
                 if (api.getGameData().objects[as.item.key].exits != null) {
                     api.actorChangeScene(api.getGameState().currentPlayer, api.getGameData().objects[as.item.key].exits);
-                } else {
-                    api.say("No puedo ir ahí.");
-                    api.say("O sea....");
-                    api.say("...si...");
-                    api.say("...pero no.");
-                }
-                break;
-            }
-            case "DAR": {
-                const actor = api.getGameState().currentPlayer;
-                const item = api.getGameState().actionState.item.key;
-                const target = api.getGameState().actionState.target.key;
-                if (actor === target) {
-                    api.say("No tiene sentido darme algo a mí mismo.");
                     break;
                 }
-                if (api.getActor(target).playable) {
-                    if (api.actorHasItem(actor, item)) {
-                        api.removeItemFromActor(actor, item);
-                        api.say(actor + ": Tomá esto.");
-                        api.addItemToActor(target, item);
-                        api.say(target + ": Gracias.");
-                    } else {
-                        api.say("Deberia agarrarlo primero.");
-                    }
-                } else {
-                    api.say("Algo me dice que no lo haga.");
-                }
-                break;
             }
             case "HABLAR": {
                 const characterKey = as.item.key;
@@ -755,34 +728,10 @@ export const storyScripts = {
                 api.startDialogue(characterKey, nodeID);
                 break;
             }
-            default: {
-                api.runScript("no_puedo");
-            }
-        }
-    },
-    'no_puedo': () => {
-        const n = Math.floor(Math.random() * 6) + 1;
-        switch (n) {
-            case 1:
-                api.say("No entiendo qué querés hacer.");
-                break;
-            case 2:
-                api.say("Mmmm.... No puedo hacer eso.");
-                break;
-            case 3:
-                api.say("Eso no tiene sentido.");
-                break;
-            case 4:
-                api.say("No sé cómo ayudarte con eso.");
-                break;
-            case 5:
-                api.say("¿Estás seguro de eso?");
-                break;
-            case 6:
-                api.say("Lo miro de todos los angulos pero no veo la forma de hacerlo.");
+            default:
+                api.say("Eso no tiene sentido");
                 break;
         }
-
     },
     'usar_pala_jardin_heladera': () => {
         const heladera = api.getGameData().objects.heladera;
@@ -889,20 +838,20 @@ export const storyScripts = {
         api.say("Por suerte compraron una botella grande.");
         api.say("Solo 70% de agua azucarada....");
         api.switchItem('vaso_vacio', 'vaso_coca');
-    }, 'usar_vaso_vacio_coto_cola': () => { api.runScript('usar_coto_cola_vaso_vacio'); },
+    },
     'usar_botella_fernet_vaso_vacio': () => {
         api.say("Por suerte compraron una botella grande.");
         api.switchItem('vaso_vacio', 'vaso_fernet');
-    }, 'usar_vaso_vacio_botella_fernet': () => { api.runScript('usar_botella_fernet_vaso_vacio'); },
+    },
     'usar_coto_cola_vaso_fernet': () => {
         api.say("soy cun crack haciendo tragos.");
         api.switchItem('vaso_fernet', 'vaso_preparado');
-    }, 'usar_vaso_fernet_coto_cola': () => { api.runScript('usar_coto_cola_vaso_fernet'); },
+    },
     'usar_botella_fernet_vaso_coca': () => {
-        api.say("Y por ultimo 30% de fernandito...");
+        api.say("Y por ultimo 30% de fernandito..."); 
         api.say("soy cun crack haciendo tragos.");
         api.switchItem('vaso_coca', 'vaso_preparado');
-    }, 'usar_vaso_coca_botella_fernet': () => { api.runScript('usar_botella_fernet_vaso_coca'); },
+    },
     'agus_dar_encendedor': () => {
         api.removeItemFromActor('agus', 'encendedor');
         api.addItemToActor(api.getGameState().currentPlayer, 'encendedor');

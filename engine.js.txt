@@ -74,7 +74,7 @@ export function handleClick() {
     if (gameState.dialogue && gameState.dialogue.active) return;
     const target = gameState.hoverTarget;
     const verb = gameState.actionState.verb;
-    console.log('handleClick: verb=', verb, ' target=', target);
+
     if (!verb) {
         console.log('No hay verbo seleccionado');
         //handleDefaultClick(target, ui);
@@ -156,11 +156,10 @@ export function handleClick() {
             gameState.actionState.target.key = target.key;
             gameState.actionState.target.type = target.type;
             parseAction()
-            return;
         }
         // Si el verbo requiere un target específico
         if (config.expects[1] && target.type === config.expects[1]) {
-            console.log('----Segundo argumento requerido válido:', target.type, target.key);
+            console.log('Segundo argumento requerido válido:', target.type, target.key);
             gameState.actionState.target.key = target.key;
             gameState.actionState.target.type = target.type;
             parseAction();
@@ -168,11 +167,11 @@ export function handleClick() {
         }
         // Si no se requiere segundo objeto, ejecuta la acción
         if (!config.expects[1]) {
-            console.log('----Ejecutando acción con un solo argumento (sin segundo requerido)');
+            console.log('Ejecutando acción con un solo argumento (sin segundo requerido)');
             parseAction();
             return;
         }
-        console.log('----Segundo argumento NO válido:', target?.type, target?.key);
+        console.log('Segundo argumento NO válido:', target?.type, target?.key);
     }
 }
 //////////////////////////////////////////////////////////////////////////////////////
