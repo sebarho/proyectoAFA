@@ -42,7 +42,7 @@ export const gameState = {
 
 export const globals = {
     debugMode: false,
-    engineVersion: '0.8.2 - Winnable!',
+    engineVersion: '0.8.3 - Backgrounds!',
     engineName: "AFAengine",
 };
 

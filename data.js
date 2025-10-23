@@ -231,6 +231,14 @@ export const storyData = {
                 'carne'
             ],
             characters: []
+        },
+        'final': {
+            name: 'Final',
+            background: { wall: '#000000', floor: '#000000' },
+            image: 'assets/images/scenes/end.jpg',
+            objects: [],
+            items:[],
+            characters: []
         }
     },
 
@@ -823,6 +831,8 @@ export const storyScripts = {
         if (api.getGameState().currentPlayer === 'Rata') {
             if (parrilla.isLit && api.getGameData().characters[api.getGameState().currentPlayer].inventory.includes('carne')) {
                 api.say("¡A la parrilla! En un rato comemos.");
+                api.hideUI();
+                api.changeScene('final');
             } else if (!parrilla.isLit) {
                 api.say("Primero hay que prender el fuego.");
             } else {

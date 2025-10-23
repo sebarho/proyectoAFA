@@ -13,7 +13,7 @@ import {
 import { drawScene } from './renderer.js';
 import {
     startDialogue as startDial, showDialogueLine, updateInventoryView, uiOptions,
-    setupCharacterSwitcher
+    setupCharacterSwitcher, ui
 } from './ui.js';
 /////////////////////////////////////////////////////////////////////////////////////
 
@@ -467,19 +467,19 @@ export function changeScene(sceneName) {
         console.warn(`changeScene: La escena "${sceneName}" no existe.`);
         return;
     }
-    state.currentScene = sceneName;
+    gameState.currentScene = sceneName;
     console.log(`changeScene: La escena actual es ahora "${sceneName}".`);
-    drawScene(ui);
+    //drawScene(ui);
 }
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function getCurrentPlayer() {
-    return state.currentPlayer;
+    return gameState.currentPlayer;
 }
 //////////////////////////////////////////////////////////////////////////////////////
 
 export function getCurrentScene() {
-    return state.currentScene;
+    return gameState.currentScene;
 }
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -503,7 +503,7 @@ export function hideUI() {
     ui.inventoryBox.style.display = 'none';
     ui.characterSwitcher.style.display = 'none';
     ui.actionText.style.display = 'none';
-    ui.dialogueOptionsContainer.style.display = 'none';
+    ui.dialogueContainer.style.display = 'none';
 }
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -516,7 +516,7 @@ export function showUI() {
     ui.inventoryBox.style.display = 'block';
     ui.characterSwitcher.style.display = 'block';
     ui.actionText.style.display = 'block';
-    ui.dialogueOptionsContainer.style.display = 'block';
+    ui.dialogueContainer.style.display = 'block';
 }
 //////////////////////////////////////////////////////////////////////////////////////
 
